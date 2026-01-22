@@ -1,0 +1,736 @@
+{
+  "episodes": [
+    {
+      "timestamp": 1769041396.105403,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "home keyboard"
+      ],
+      "objects": [
+        {
+          "name": "home keyboard",
+          "category": "computer keyboard",
+          "confidence": 0.8903085589408875,
+          "bbox": [
+            290,
+            265,
+            548,
+            393
+          ],
+          "center": [
+            419,
+            329
+          ],
+          "area": 33024,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769041404.358362,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "mouse pad"
+      ],
+      "objects": [
+        {
+          "name": "mouse pad",
+          "category": "mousepad",
+          "confidence": 0.9191123247146606,
+          "bbox": [
+            93,
+            222,
+            639,
+            479
+          ],
+          "center": [
+            366,
+            350
+          ],
+          "area": 140322,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769041481.2373173,
+      "event_type": "learning",
+      "event_detail": "Learned new object 'take away coffee cup' with 10 views",
+      "object_names": [
+        "take away coffee cup"
+      ],
+      "objects": [
+        {
+          "name": "take away coffee cup",
+          "category": "loudspeaker",
+          "confidence": 1.0,
+          "bbox": [
+            564,
+            371,
+            639,
+            464
+          ],
+          "center": [
+            601,
+            417
+          ],
+          "area": 6975,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769041487.299034,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "home keyboard"
+      ],
+      "objects": [
+        {
+          "name": "home keyboard",
+          "category": "computer keyboard",
+          "confidence": 0.9275109767913818,
+          "bbox": [
+            306,
+            279,
+            560,
+            410
+          ],
+          "center": [
+            433,
+            344
+          ],
+          "area": 33274,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769041495.1532667,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "headphones"
+      ],
+      "objects": [
+        {
+          "name": "headphones",
+          "category": "loudspeaker",
+          "confidence": 0.9725003838539124,
+          "bbox": [
+            77,
+            0,
+            131,
+            36
+          ],
+          "center": [
+            104,
+            18
+          ],
+          "area": 1944,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769041502.7683623,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "home keyboard"
+      ],
+      "objects": [
+        {
+          "name": "home keyboard",
+          "category": "computer keyboard",
+          "confidence": 0.8894254565238953,
+          "bbox": [
+            311,
+            270,
+            517,
+            362
+          ],
+          "center": [
+            414,
+            316
+          ],
+          "area": 18952,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769041558.4026701,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "iphone"
+      ],
+      "objects": [
+        {
+          "name": "iphone",
+          "category": "mobile phone",
+          "confidence": 0.9051580429077148,
+          "bbox": [
+            324,
+            261,
+            437,
+            391
+          ],
+          "center": [
+            380,
+            326
+          ],
+          "area": 14690,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769043429.6810348,
+      "event_type": "learning",
+      "event_detail": "Learned new object 'microphone' with 10 views",
+      "object_names": [
+        "microphone"
+      ],
+      "objects": [
+        {
+          "name": "microphone",
+          "category": "computer mouse",
+          "confidence": 1.0,
+          "bbox": [
+            0,
+            402,
+            61,
+            462
+          ],
+          "center": [
+            30,
+            432
+          ],
+          "area": 3660,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769043445.7439501,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "air conditioner remote"
+      ],
+      "objects": [
+        {
+          "name": "air conditioner remote",
+          "category": "remote control",
+          "confidence": 0.8851295113563538,
+          "bbox": [
+            505,
+            250,
+            591,
+            325
+          ],
+          "center": [
+            548,
+            287
+          ],
+          "area": 6450,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769043463.368658,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "home keyboard"
+      ],
+      "objects": [
+        {
+          "name": "home keyboard",
+          "category": "computer keyboard",
+          "confidence": 0.8856054544448853,
+          "bbox": [
+            280,
+            256,
+            528,
+            378
+          ],
+          "center": [
+            404,
+            317
+          ],
+          "area": 30256,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769043478.1809635,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "computer mouse"
+      ],
+      "objects": [
+        {
+          "name": "computer mouse",
+          "category": "computer mouse",
+          "confidence": 0.9169450998306274,
+          "bbox": [
+            176,
+            327,
+            226,
+            404
+          ],
+          "center": [
+            201,
+            365
+          ],
+          "area": 3850,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769043547.7537584,
+      "event_type": "misclassification",
+      "event_detail": "Florence classified 'iphone' as 'remote control' but it's actually a 'mobile phone'",
+      "object_names": [
+        "iphone"
+      ],
+      "objects": [
+        {
+          "name": "iphone",
+          "category": "remote control",
+          "confidence": 1.0,
+          "bbox": [
+            437,
+            354,
+            496,
+            467
+          ],
+          "center": [
+            466,
+            410
+          ],
+          "area": 6667,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769043555.9654453,
+      "event_type": "learning",
+      "event_detail": "Learned object 'iphone' with 1 views",
+      "object_names": [
+        "iphone"
+      ],
+      "objects": [
+        {
+          "name": "iphone",
+          "category": "mobile phone",
+          "confidence": 1.0,
+          "bbox": [
+            437,
+            354,
+            496,
+            467
+          ],
+          "center": [
+            466,
+            410
+          ],
+          "area": 6667,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769043572.0896742,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "home keyboard"
+      ],
+      "objects": [
+        {
+          "name": "home keyboard",
+          "category": "computer keyboard",
+          "confidence": 0.8681873679161072,
+          "bbox": [
+            331,
+            242,
+            576,
+            320
+          ],
+          "center": [
+            453,
+            281
+          ],
+          "area": 19110,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769043637.2308133,
+      "event_type": "misclassification",
+      "event_detail": "Florence classified 'air conditioner remote' as 'mobile phone' but it's actually a 'remote control'",
+      "object_names": [
+        "air conditioner remote"
+      ],
+      "objects": [
+        {
+          "name": "air conditioner remote",
+          "category": "mobile phone",
+          "confidence": 1.0,
+          "bbox": [
+            319,
+            370,
+            410,
+            479
+          ],
+          "center": [
+            364,
+            424
+          ],
+          "area": 9919,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769043640.0474849,
+      "event_type": "learning",
+      "event_detail": "Learned object 'air conditioner remote' with 1 views",
+      "object_names": [
+        "air conditioner remote"
+      ],
+      "objects": [
+        {
+          "name": "air conditioner remote",
+          "category": "remote control",
+          "confidence": 1.0,
+          "bbox": [
+            319,
+            370,
+            410,
+            479
+          ],
+          "center": [
+            364,
+            424
+          ],
+          "area": 9919,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769043674.4093056,
+      "event_type": "misclassification",
+      "event_detail": "Florence classified 'iphone' as 'remote control' but it's actually a 'mobile phone'",
+      "object_names": [
+        "iphone"
+      ],
+      "objects": [
+        {
+          "name": "iphone",
+          "category": "remote control",
+          "confidence": 1.0,
+          "bbox": [
+            426,
+            379,
+            488,
+            479
+          ],
+          "center": [
+            457,
+            429
+          ],
+          "area": 6200,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769043677.1772125,
+      "event_type": "learning",
+      "event_detail": "Learned object 'iphone' with 1 views",
+      "object_names": [
+        "iphone"
+      ],
+      "objects": [
+        {
+          "name": "iphone",
+          "category": "mobile phone",
+          "confidence": 1.0,
+          "bbox": [
+            426,
+            379,
+            488,
+            479
+          ],
+          "center": [
+            457,
+            429
+          ],
+          "area": 6200,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769044049.3525906,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "air conditioner remote"
+      ],
+      "objects": [
+        {
+          "name": "air conditioner remote",
+          "category": "remote control",
+          "confidence": 0.8775407671928406,
+          "bbox": [
+            449,
+            379,
+            535,
+            479
+          ],
+          "center": [
+            492,
+            429
+          ],
+          "area": 8600,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769044066.9430377,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "computer mouse"
+      ],
+      "objects": [
+        {
+          "name": "computer mouse",
+          "category": "computer mouse",
+          "confidence": 0.9165172576904297,
+          "bbox": [
+            171,
+            340,
+            225,
+            420
+          ],
+          "center": [
+            198,
+            380
+          ],
+          "area": 4320,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769044084.7618864,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "computer mouse"
+      ],
+      "objects": [
+        {
+          "name": "computer mouse",
+          "category": "computer mouse",
+          "confidence": 0.9083618521690369,
+          "bbox": [
+            161,
+            354,
+            215,
+            429
+          ],
+          "center": [
+            188,
+            391
+          ],
+          "area": 4050,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769044102.2945168,
+      "event_type": "observation",
+      "event_detail": "",
+      "object_names": [
+        "iphone"
+      ],
+      "objects": [
+        {
+          "name": "iphone",
+          "category": "mobile phone",
+          "confidence": 0.8300106525421143,
+          "bbox": [
+            336,
+            402,
+            453,
+            479
+          ],
+          "center": [
+            394,
+            440
+          ],
+          "area": 9009,
+          "is_focus": true
+        }
+      ]
+    },
+    {
+      "timestamp": 1769044168.7610078,
+      "event_type": "correction",
+      "event_detail": "Corrected misidentification from 'iphone' to 'air conditioner remote'",
+      "object_names": [
+        "air conditioner remote"
+      ],
+      "objects": [
+        {
+          "name": "air conditioner remote",
+          "category": "mobile phone",
+          "confidence": 1.0,
+          "bbox": [
+            336,
+            402,
+            453,
+            479
+          ],
+          "center": [
+            394,
+            440
+          ],
+          "area": 9009,
+          "is_focus": true
+        }
+      ]
+    }
+  ],
+  "co_occurrences": {},
+  "spatial_priors": {
+    "home keyboard": [
+      [
+        419,
+        329
+      ],
+      [
+        433,
+        344
+      ],
+      [
+        414,
+        316
+      ],
+      [
+        404,
+        317
+      ],
+      [
+        453,
+        281
+      ]
+    ],
+    "mouse pad": [
+      [
+        366,
+        350
+      ]
+    ],
+    "take away coffee cup": [
+      [
+        601,
+        417
+      ]
+    ],
+    "headphones": [
+      [
+        104,
+        18
+      ]
+    ],
+    "iphone": [
+      [
+        380,
+        326
+      ],
+      [
+        466,
+        410
+      ],
+      [
+        466,
+        410
+      ],
+      [
+        457,
+        429
+      ],
+      [
+        457,
+        429
+      ],
+      [
+        394,
+        440
+      ]
+    ],
+    "microphone": [
+      [
+        30,
+        432
+      ]
+    ],
+    "air conditioner remote": [
+      [
+        548,
+        287
+      ],
+      [
+        364,
+        424
+      ],
+      [
+        364,
+        424
+      ],
+      [
+        492,
+        429
+      ],
+      [
+        394,
+        440
+      ]
+    ],
+    "computer mouse": [
+      [
+        201,
+        365
+      ],
+      [
+        198,
+        380
+      ],
+      [
+        188,
+        391
+      ]
+    ]
+  }
+}

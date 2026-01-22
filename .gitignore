@@ -1,0 +1,19 @@
+# Models (too large for git)
+models/
+*.pt
+*.pth
+*.bin
+
+# Data
+data/training/
+
+# Python
+__pycache__/
+*.pyc
+.env
+
+# Audio temp files
+*.wav
+
+# IDE
+.vscode/

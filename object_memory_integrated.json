@@ -1,0 +1,149 @@
+{
+  "home keyboard": {
+    "category": "computer keyboard",
+    "num_embeddings": 13,
+    "learned_at": 1768868678.5119355,
+    "last_seen": 1769043592.1786594,
+    "times_seen": 26
+  },
+  "work back back": {
+    "category": "backpack",
+    "num_embeddings": 1,
+    "learned_at": 1768868727.0291939,
+    "last_seen": 1768868727.0291939,
+    "times_seen": 1
+  },
+  "iphone": {
+    "category": "mobile phone",
+    "num_embeddings": 21,
+    "learned_at": 1768868750.520812,
+    "last_seen": 1769044102.2945168,
+    "times_seen": 43
+  },
+  "mouse pad": {
+    "category": "mousepad",
+    "num_embeddings": 4,
+    "learned_at": 1768868819.8151248,
+    "last_seen": 1769041404.358362,
+    "times_seen": 9
+  },
+  "computer mouse": {
+    "category": "computer mouse",
+    "num_embeddings": 13,
+    "learned_at": 1768868856.4616897,
+    "last_seen": 1769044084.7618864,
+    "times_seen": 25
+  },
+  "air conditioner remote": {
+    "category": "remote control",
+    "num_embeddings": 30,
+    "learned_at": 1768868917.3936083,
+    "last_seen": 1769044168.7610078,
+    "times_seen": 35
+  },
+  "supplement bottle": {
+    "category": "bottle",
+    "num_embeddings": 13,
+    "learned_at": 1768869504.7162657,
+    "last_seen": 1769025988.2994914,
+    "times_seen": 17
+  },
+  "car keys": {
+    "category": "key",
+    "num_embeddings": 10,
+    "learned_at": 1768869611.9914594,
+    "last_seen": 1768869649.876278,
+    "times_seen": 10
+  },
+  "don smith resonance book": {
+    "category": "book",
+    "num_embeddings": 10,
+    "learned_at": 1768869673.087451,
+    "last_seen": 1768898773.5373864,
+    "times_seen": 12
+  },
+  "work backpack": {
+    "category": "backpack",
+    "num_embeddings": 1,
+    "learned_at": 1768898174.0487857,
+    "last_seen": 1768898174.0487857,
+    "times_seen": 1
+  },
+  "swiss army watch": {
+    "category": "watch",
+    "num_embeddings": 10,
+    "learned_at": 1768898680.0360405,
+    "last_seen": 1768898715.9367795,
+    "times_seen": 10
+  },
+  "wedding ring": {
+    "category": "ring",
+    "num_embeddings": 11,
+    "learned_at": 1768898796.602559,
+    "last_seen": 1769039518.2993581,
+    "times_seen": 13
+  },
+  "scissors": {
+    "category": "scissors",
+    "num_embeddings": 13,
+    "learned_at": 1768898901.6782176,
+    "last_seen": 1769039541.269246,
+    "times_seen": 17
+  },
+  "ukulele": {
+    "category": "guitar",
+    "num_embeddings": 10,
+    "learned_at": 1768898977.2126896,
+    "last_seen": 1768899013.3540034,
+    "times_seen": 10
+  },
+  "book": {
+    "category": "book",
+    "num_embeddings": 6,
+    "learned_at": 1768939442.814015,
+    "last_seen": 1768939463.4268987,
+    "times_seen": 6
+  },
+  "coffee mug": {
+    "category": "coffee cup",
+    "num_embeddings": 1,
+    "learned_at": 1769025795.8550363,
+    "last_seen": 1769025795.8550363,
+    "times_seen": 1
+  },
+  "flamey": {
+    "category": "bird",
+    "num_embeddings": 3,
+    "learned_at": 1769025948.1907895,
+    "last_seen": 1769043504.6650207,
+    "times_seen": 4
+  },
+  "rubbish bin": {
+    "category": "trash bin/can",
+    "num_embeddings": 1,
+    "learned_at": 1769026031.6946409,
+    "last_seen": 1769026031.6946409,
+    "times_seen": 1
+  },
+  "headphones": {
+    "category": "loudspeaker",
+    "num_embeddings": 1,
+    "learned_at": 1769039488.7363167,
+    "last_seen": 1769041495.1532667,
+    "times_seen": 3
+  },
+  "take away coffee cup": {
+    "category": "loudspeaker",
+    "num_embeddings": 10,
+    "learned_at": 1769041439.611649,
+    "last_seen": 1769041481.2373173,
+    "times_seen": 10
+  },
+  "microphone": {
+    "category": "computer mouse",
+    "num_embeddings": 10,
+    "learned_at": 1769043383.5376074,
+    "last_seen": 1769043429.6810348,
+    "times_seen": 10
+  }
+}
