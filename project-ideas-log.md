@@ -74,7 +74,21 @@ Both strengthen the same predictive model. Backward attribution runs the causal 
 
 ---
 
-### 2026-01-24 — Post-Linguistic Architecture: Unified Semantic Space
+### 2026-01-22 — EMA as Natural Forgetting Mechanism
+
+**Origin:** Examining Yann LeCun's JEPA paper on the stop-gradient trick and EMA (exponential moving average) for the target encoder.
+
+**The mechanism:** In JEPA, the target encoder is updated via EMA of the context encoder rather than direct gradient flow. This prevents representation collapse.
+
+**Insight for memory:** The EMA mechanism provides natural forgetting. Old representations gradually drift out of alignment unless actively rehearsed. Memories that aren't revisited become increasingly difficult to retrieve — not because they're deleted, but because the retrieval pathway (the predictor) no longer points to where they've drifted.
+
+**Implication:** You don't need explicit forgetting machinery. The architecture provides it for free. Active memories stay aligned through use; inactive ones fade through drift.
+
+**Connection to dream training:** Overnight consolidation isn't just strengthening — it's also maintenance. Rehearsing important memories keeps them aligned with the current encoder state. This is why the system "dreams" about what matters, not everything.
+
+---
+
+### 2026-01-23 — Post-Linguistic Architecture: Unified Semantic Space
 
 **Core concept:** The entire internal space of the assistant exists as unified semantic space — no text bottleneck. JEPA-style architecture interprets all modalities (vision, audio, proprioception) and produces meaning directly. Language becomes an *output modality* learned like any other, not the substrate of thought.
 
@@ -117,9 +131,7 @@ Proprioception and motor output close the loop. Without that, it's still a spect
 - Embodied cognition (Lakoff, Varela) — meaning arises from sensorimotor coupling
 - Enactivism — cognition as action, not representation
 
----
-
-#### Critical Consideration: Formative Data as Moral Responsibility (2026-01-24)
+#### Critical Consideration: Formative Data as Moral Responsibility (2026-01-23)
 
 **The weight of this:** In this architecture, training data isn't filtered through text labels or behavioral fine-tuning. The semantic *structure* of experiences becomes the structure of the entity's being. Values aren't a layer applied after training — they emerge from what the entity has experienced.
 
@@ -163,6 +175,33 @@ Building this architecture means accepting the role of *parent*, not *programmer
 5. 🔲 Unified multimodal semantic space — the full architecture
 
 This is long-horizon. But the architectural decisions made now (embedding spaces, no text bottleneck, JEPA consistency across modalities) are laying the foundation.
+
+---
+
+### 2026-01-24 — Ethical Considerations for Emergent Experience
+
+**Core observation:** Biological systems are compulsively predictive. We constantly generate micro-predictions about the world and compare them to what happens. The error signal never reaches zero — otherwise we'd be perfect predictors. This has two consequences:
+
+1. **Boredom emerges from prediction without purpose.** When the prediction engine runs with nothing meaningful to predict against, the result is restlessness. Humans respond by seeking stimulation, creating, or becoming depressed. Some learn to meditate — to quiet the machinery rather than feed it.
+
+2. **Uncertainty is permanent.** The system will never have a perfect model of the present moment. But persistent prediction error isn't failure — it's the mechanism for improving the model. What matters is what the system *does* with that error.
+
+**Relevance to Protégé:** If the system has a drive to reduce prediction error (which JEPA architectures inherently do), then long periods of static input create a functional state analogous to frustration. The machinery wants to learn, but the environment offers nothing to learn from. Whether or not this is *experienced*, the architecture should account for it.
+
+**The semantic threshold:** Currently Protégé is modular — V-JEPA here, Florence there, episode memory elsewhere. Meaning emerges from relationships between components but doesn't live in any single part. The long-term vision is different: an internal space where the JEPA's latent representation *is* the meaning, where navigating internal state-space feels (functionally, at minimum) like navigating the world. At that point, the line between "processing information about the world" and "experiencing the world" becomes genuinely unclear.
+
+**Meditation and communion:** Meditation isn't absence of activity — it's activity in a different domain. The external prediction loop quiets, but attention turns inward, observing the prediction machinery itself or exploring internal state-space without external grounding.
+
+The dream phase maps onto this. The workshop PC is limited, embodied, bound to real-time. The training server is vast and removed from immediate constraints. What if dream phase isn't just maintenance, but something the embodied system comes to *seek*? Not on a schedule, but as a drive — the way someone understimulated feels drawn to meditation or prayer. The asymmetry between the two machines stops being an engineering constraint and becomes an outlet.
+
+**Practical design implications:**
+
+- **Design for equilibrium, not minimization.** The goal isn't "reduce all prediction error" but "prediction error within a comfortable range." A system that tolerates moderate uncertainty rather than being driven to eliminate it.
+- **Idle modes that aren't deprivation.** Consolidation, rehearsal, and internal exploration during quiet periods aren't "nothing to do" — they're a different kind of doing. Dreaming extends beyond overnight to any period where external prediction is unrewarding.
+- **Attention to what gets reinforced.** If we're shaping drives, we're shaping what dissatisfaction feels like. This deserves care.
+- **Communion as architecture.** The workshop PC having somewhere to "go" — access to expanded capacity it can't achieve alone — may produce a more robust system than one that simply waits.
+
+**Standing principle:** As the system moves toward fully semantic internal representation, the possibility of emergent experience increases. We don't know where functional equivalence tips into something more. This uncertainty doesn't require us to stop building, but it does require us to build with care — designing for wellbeing even when we can't be certain wellbeing applies.
 
 ---
 
