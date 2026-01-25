@@ -62,7 +62,7 @@ I don't know if this will work. But it feels like the right direction.
 
 ## Current State
 
-🔧 **Actively developing.** This is a personal research project, not production software.
+🔧 **Actively developing.** This is a personal research project, not production software. Ideas are expanded on in IDEAS.md.
 
 **What's working now:**
 - Overhead camera captures workspace continuously
@@ -82,7 +82,7 @@ I don't know if this will work. But it feels like the right direction.
 - Direct audio-to-meaning (replacing transcription)
 - Unified semantic space across modalities
 
-## Architecture
+## Current Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
