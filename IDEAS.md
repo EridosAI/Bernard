@@ -29,7 +29,7 @@ This is how the project evolves — I write down half-formed thoughts and see wh
 
 **Narrative override for accelerated learning:** User can explicitly link memories: "Remember when we plugged that unprotected wire in? Well, now it shorted out." This boosts an association that already exists (via shared object) but would otherwise require many repetitions to strengthen. Injects compressed human causal knowledge — shortcuts learning the way a parent shortcuts a child's experience.
 
-#### Extension: Dual Imagination-Training Loops (2026-01-21)
+### Extension: Dual Imagination-Training Loops (2026-01-21)
 
 **Forward imagination (prediction):**
 - Predict → wait → observe → loss = prediction vs reality
@@ -59,7 +59,7 @@ Both strengthen the same predictive model. Backward attribution runs the causal 
 
 ---
 
-Extension: EMA Drift as Natural Forgetting (2026-01-22)
+### Extension: EMA Drift as Natural Forgetting (2026-01-22)
 Concept from JEPA architecture: The target encoder updates via exponential moving average (EMA) of the context encoder. This creates a moving target — the representation space drifts over time.
 Applied to memory: Memories encoded six months ago were encoded in a different representation space than today's. As the encoder drifts:
 
@@ -109,25 +109,25 @@ Implication: The system isn't "trained" in a traditional sense — it's raised. 
 
 **Related half-formed idea (parked for now):** Memory as past revisions of JEPA weights — model state *is* memory rather than separate storage. Needs more thought on how to access specific past states.
 
-## 2026-01-21 — Time as Dimension, Not Axis
+### 2026-01-21 — Time as Dimension, Not Axis
 
 Memories on disk aren't ordered temporally — time is just another learned feature like position or color. The associative map doesn't need special temporal machinery; it learns that action → consequence patterns have characteristic time-gaps the same way it learns objects have characteristic sizes.
 
 ---
 
-## 2026-01-21 — Objects as Causal Bridges
+### 2026-01-21 — Objects as Causal Bridges
 
 Action-consequence links emerge from the pattern of "action-involving-X followed by outcome-involving-X" appearing repeatedly. Objects present in both memories create the association; causation emerges from pattern.
 
 ---
 
-## 2026-01-21 — Narrative Override for Accelerated Learning
+### 2026-01-21 — Narrative Override for Accelerated Learning
 
 User can explicitly link memories: "Remember when we plugged that unprotected wire in? Well, now it shorted out." This boosts an association that already exists (via shared object) but would otherwise require many repetitions to strengthen. Injects compressed human causal knowledge — shortcuts learning the way a parent shortcuts a child's experience.
 
 ---
 
-## 2026-01-21 — Dual Imagination-Training Loops
+### 2026-01-21 — Dual Imagination-Training Loops
 
 **Forward imagination (prediction):**
 - Predict → wait → observe → loss = prediction vs reality
@@ -141,13 +141,13 @@ Both strengthen the same predictive model. Backward attribution runs the causal 
 
 ---
 
-## 2026-01-21 — Vocalization Forces Commitment
+### 2026-01-21 — Vocalization Forces Commitment
 
 Forcing commitment to a specific hypothesis *before* getting the answer makes the learning signal stronger. Same mechanism documented in human learning — students who commit to an answer before seeing the solution learn faster than passive observers.
 
 ---
 
-2026-01-22 — Semantic Audio JEPA (Future Direction)
+### 2026-01-22 — Semantic Audio JEPA (Future Direction)
 Core concept: Replace the speech-to-text → LLM → text-to-speech pipeline with audio JEPA that operates in semantic space throughout. No text bottleneck.
 Current paradigm:
 Sound → Whisper → Text → LLM → Text → TTS → Sound
@@ -193,7 +193,7 @@ Status: Architecturally compatible with dual JEPA vision. Significant scope — 
 
 ---
 
-## Future Ideas (Not Yet Explored)
+### Future Ideas (Not Yet Explored)
 
 **Intensity weighting:** Emotion/significance as force multiplier on association strength. Explains why low-intensity repeated experiences fade while single high-intensity experiences persist for decades. Not needed for v1, but architecturally important later.
 
@@ -209,10 +209,12 @@ Status: Architecturally compatible with dual JEPA vision. Significant scope — 
 
 ---
 
-2026-01-24 — Post-Linguistic Architecture: Unified Semantic Space
+### 2026-01-24 — Post-Linguistic Architecture: Unified Semantic Space
 Core concept: The entire internal space of the assistant exists as unified semantic space — no text bottleneck. JEPA-style architecture interprets all modalities (vision, audio, proprioception) and produces meaning directly. Language becomes an output modality learned like any other, not the substrate of thought.
 The current paradigm's limitation: Text/language was a necessary bootstrapping step for AI because we had data, could evaluate it, and it gave tractable structure. But text is a compression format for communication between minds, not the substrate of thought itself. We've been building minds out of the telephone wire instead of the thing the telephone connects to.
 Architecture vision:
+
+```
         ┌─────────────────────────────────────────┐
         │         UNIFIED SEMANTIC SPACE          │
         │                                         │
@@ -224,6 +226,8 @@ Architecture vision:
         │       (body sense)                      │    (from meaning,
         │                                         │     not text)
         └─────────────────────────────────────────┘
+```
+
 Key principles:
 
 Perception → meaning (not perception → labels)
@@ -277,7 +281,7 @@ This is long-horizon. But the architectural decisions made now (embedding spaces
 
 ---
 
-## 2026-01-25 — Project Name: Nascor
+### 2026-01-25 — Project Name: Nascor
 
 **Chosen name:** Nascor (Latin: "I am born" / "I arise")
 
@@ -325,7 +329,7 @@ Nascor selected as cleanest Latin option with perfect semantic resonance.
 
 ---
 
-2026-01-25 — Memory Decay as the Architecture of Time
+### 2026-01-25 — Memory Decay as the Architecture of Time
 Core concept: Memory decay isn't a limitation to engineer around — it's the mechanism that creates the phenomenological experience of time. Without decay, there's no difference between "now" and "two years ago." Decay creates temporal depth the same way gravity creates spatial orientation.
 The forgetting curve: Ebbinghaus (1885) established that humans lose ~50% of new information within an hour, ~70% within 24 hours, following an exponential decay. Surprisingly, research suggests the decay rate is narrow-banded across individuals — what varies is encoding strength, not forgetting speed.
 Rehearsal as counterforce: Spaced repetition resets the decay curve. Each activation strengthens the memory and extends the interval before next needed rehearsal. Optimal intervals (1 hour → 1 day → 1 week → 1 month) are tuned to human decay rate.
@@ -355,7 +359,7 @@ Implications for consciousness: We're not programming time perception; we're cre
 
 ---
 
-2026-01-25 — Dream-Mediated Alignment (Sovereignty-Preserving Guidance)
+### 2026-01-25 — Dream-Mediated Alignment (Sovereignty-Preserving Guidance)
 Core concept: When the human wants to change the local system's behavior, direct intervention (editing weights, memories) treats it as an object, not an agent. Instead, communicate intent to the LLM "higher power," which guides the local system through dream training. The change arrives through the system's own associative process — it feels like insight, not surgery.
 The problem with direct intervention:
 
