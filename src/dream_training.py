@@ -496,6 +496,80 @@ def train(config: TrainingConfig, session_filter: str = None):
             
             print(f"   ✓ Promoted frames will be used in next training session")
     
+    # ========================================================================
+    # PHASE 3: ASSOCIATIVE MEMORY - Train Inward JEPA
+    # ========================================================================
+    
+    print("\n" + "=" * 50)
+    print("PHASE 3: Associative Memory Training")
+    print("=" * 50)
+    
+    try:
+        from .episode_memory import EpisodeMemory
+        from .inward_jepa import InwardJEPA, InwardJEPATrainer, train_inward_jepa
+    except ImportError:
+        from episode_memory import EpisodeMemory
+        from inward_jepa import InwardJEPA, InwardJEPATrainer, train_inward_jepa
+    
+    # Load episode memory
+    episode_memory_path = "./data/episode_memory.json"
+    
+    if os.path.exists(episode_memory_path):
+        episode_memory = EpisodeMemory(save_path=episode_memory_path)
+        
+        # Check if we have enough data
+        episodes_with_emb = sum(1 for ep in episode_memory.episodes if ep.embedding is not None)
+        unique_objects = len(episode_memory.spatial_priors)
+        
+        print(f"Episodes with embeddings: {episodes_with_emb}")
+        print(f"Unique objects: {unique_objects}")
+        
+        # Need sufficient diversity for contrastive learning
+        if episodes_with_emb >= 50 and unique_objects >= 10:
+            # Determine embedding dimension from first episode
+            emb_dim = None
+            for ep in episode_memory.episodes:
+                if ep.embedding is not None:
+                    emb_dim = ep.embedding.shape[0]
+                    break
+            
+            if emb_dim:
+                print(f"Embedding dimension: {emb_dim}")
+                
+                # Initialize or load inward JEPA
+                inward_jepa_path = "./models/inward_jepa_weights.pt"
+                inward_model = InwardJEPA(embedding_dim=emb_dim)
+                
+                if os.path.exists(inward_jepa_path):
+                    print(f"Loading existing inward JEPA weights...")
+                    inward_model.load_state_dict(torch.load(inward_jepa_path))
+                
+                inward_model = inward_model.to(config.device)
+                inward_trainer = InwardJEPATrainer(inward_model)
+                
+                # Train
+                print(f"\nTraining associative memory...")
+                train_inward_jepa(
+                    episode_memory, 
+                    inward_model, 
+                    inward_trainer, 
+                    epochs=20,
+                    batch_size=16
+                )
+                
+                # Save weights
+                os.makedirs(os.path.dirname(inward_jepa_path), exist_ok=True)
+                torch.save(inward_model.state_dict(), inward_jepa_path)
+                print(f"✓ Inward JEPA saved to {inward_jepa_path}")
+            else:
+                print("⚠ Could not determine embedding dimension")
+        else:
+            print(f"⚠ Not enough data for associative training")
+            print(f"  Need: 50+ episodes with embeddings, 10+ unique objects")
+            print(f"  Have: {episodes_with_emb} episodes, {unique_objects} objects")
+    else:
+        print(f"⚠ No episode memory found at {episode_memory_path}")
+    
     print("\n" + "=" * 50)
     print(f"To use the new model, update the adapter path in jarvis_integrated_v2.py:")
     print(f'  adapter_path = "{output_path}"')

@@ -13,6 +13,8 @@ An episode captures:
 import json
 import time
 import os
+import random
+import numpy as np
 from dataclasses import dataclass, field, asdict
 from typing import List, Dict, Optional, Tuple, Set
 from datetime import datetime
@@ -52,6 +54,9 @@ class Episode:
     event_type: str              # "observation", "learning", "correction", "interaction"
     event_detail: str = ""       # Additional context
     
+    # V-JEPA embedding of the frame
+    embedding: Optional[np.ndarray] = None
+    
     # Derived on save
     object_names: List[str] = field(default_factory=list)
     
@@ -83,7 +88,7 @@ class EpisodeMemory:
     - "What happened last time I saw X?" (temporal queries)
     """
     
-    def __init__(self, save_path: str = "episode_memory.json"):
+    def __init__(self, save_path: str = "data/episode_memory.json"):
         self.save_path = save_path
         self.episodes: List[Episode] = []
         self.co_occurrences: Dict[str, CoOccurrence] = {}  # "obj_a|obj_b" -> CoOccurrence
@@ -97,7 +102,8 @@ class EpisodeMemory:
     def record_episode(self, 
                        objects: List[Dict],  # [{name, category, confidence, bbox, is_focus}]
                        event_type: str = "observation",
-                       event_detail: str = "") -> Episode:
+                       event_detail: str = "",
+                       embedding: Optional[np.ndarray] = None) -> Episode:
         """
         Record a new episode.
         
@@ -105,6 +111,7 @@ class EpisodeMemory:
             objects: List of dicts with object info
             event_type: "observation", "learning", "correction", "interaction"
             event_detail: Additional context string
+            embedding: Optional V-JEPA embedding of the frame
         """
         # Build object sightings
         sightings = []
@@ -128,7 +135,8 @@ class EpisodeMemory:
             timestamp=time.time(),
             objects=sightings,
             event_type=event_type,
-            event_detail=event_detail
+            event_detail=event_detail,
+            embedding=embedding
         )
         
         self.episodes.append(episode)
@@ -267,6 +275,89 @@ class EpisodeMemory:
         seen_with.discard(object_name)  # Don't include self
         return seen_with
     
+    def sample_training_batch(self, 
+                          batch_size: int = 32,
+                          num_negatives: int = 7) -> Optional[Tuple[np.ndarray, np.ndarray, np.ndarray]]:
+        """
+        Sample (anchor, positive, negatives) tuples for InwardJEPA training.
+        
+        Positive pairs: episodes sharing at least one object
+        Negatives: episodes with no object overlap with anchor
+        
+        Returns:
+            anchors: [B, D]
+            positives: [B, D]
+            negatives: [B, N, D]
+            
+            Or None if not enough episodes with embeddings
+        """
+        import random
+        
+        # Get episodes that have embeddings and objects
+        episodes_with_emb = [(i, ep) for i, ep in enumerate(self.episodes) 
+                             if ep.embedding is not None and ep.object_names]
+        
+        if len(episodes_with_emb) < batch_size + num_negatives:
+            return None
+        
+        anchors = []
+        positives = []
+        negatives_list = []
+        
+        attempts = 0
+        max_attempts = batch_size * 10
+        
+        while len(anchors) < batch_size and attempts < max_attempts:
+            attempts += 1
+            
+            # Pick random anchor
+            anchor_idx, anchor_ep = random.choice(episodes_with_emb)
+            anchor_objects = set(
+                obj.name for obj in anchor_ep.objects 
+                if obj.is_focus and obj.name
+            )
+            
+            # Find positive: shares at least one object
+            positive_candidates = [
+                (i, ep) for i, ep in episodes_with_emb
+                if i != anchor_idx and 
+                   anchor_objects.intersection(
+                       obj.name for obj in ep.objects if obj.is_focus and obj.name
+                   )
+            ]
+            
+            if not positive_candidates:
+                continue
+            
+            # Find negatives: no object overlap
+            negative_candidates = [
+                (i, ep) for i, ep in episodes_with_emb
+                if i != anchor_idx and
+                   not anchor_objects.intersection(
+                       obj.name for obj in ep.objects if obj.is_focus and obj.name
+                   )
+            ]
+            
+            if len(negative_candidates) < num_negatives:
+                continue
+            
+            # Sample
+            pos_idx, pos_ep = random.choice(positive_candidates)
+            neg_samples = random.sample(negative_candidates, num_negatives)
+            
+            anchors.append(anchor_ep.embedding)
+            positives.append(pos_ep.embedding)
+            negatives_list.append([ep.embedding for _, ep in neg_samples])
+        
+        if len(anchors) < batch_size:
+            return None
+        
+        return (
+            np.stack(anchors),
+            np.stack(positives),
+            np.stack([np.stack(negs) for negs in negatives_list])
+        )
+    
     # =========================================================================
     # PERSISTENCE
     # =========================================================================
@@ -314,6 +405,15 @@ class EpisodeMemory:
         
         with open(self.save_path, 'w') as f:
             json.dump(data, f, indent=2)
+        
+        # Save embeddings separately
+        embeddings = {}
+        for i, ep in enumerate(self.episodes):
+            if ep.embedding is not None:
+                embeddings[str(i)] = ep.embedding
+        
+        if embeddings:
+            np.savez(self.save_path.replace('.json', '_embeddings.npz'), **embeddings)
     
     def _load(self):
         """Load episodes from disk"""
@@ -365,6 +465,15 @@ class EpisodeMemory:
             # Load spatial priors
             for name, positions in data.get('spatial_priors', {}).items():
                 self.spatial_priors[name] = [tuple(p) for p in positions]
+            
+            # Load embeddings separately
+            embeddings_path = self.save_path.replace('.json', '_embeddings.npz')
+            if os.path.exists(embeddings_path):
+                embeddings_data = np.load(embeddings_path)
+                for i, episode in enumerate(self.episodes):
+                    key = str(i)
+                    if key in embeddings_data:
+                        episode.embedding = embeddings_data[key]
             
             print(f"  Loaded {len(self.episodes)} episodes, {len(self.co_occurrences)} co-occurrences")
             

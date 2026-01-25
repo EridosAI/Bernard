@@ -6,6 +6,8 @@ models/
 
 # Data
 data/training/
+data/vggsound/
+data/howto100m/
 
 # Python
 __pycache__/

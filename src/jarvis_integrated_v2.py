@@ -15,6 +15,9 @@ import time
 import json
 import os
 import re
+import threading
+import queue
+from collections import deque
 from PIL import Image
 from dataclasses import dataclass, field
 from typing import Optional, Dict, List, Tuple, Any
@@ -26,6 +29,12 @@ import pyaudio
 import wave
 import soundfile as sf
 
+# Continuous listening
+try:
+    from .continuous_listening import ContinuousListener, Intent, VoiceEvent
+except ImportError:
+    from continuous_listening import ContinuousListener, Intent, VoiceEvent
+
 # Models
 from transformers import AutoModel, AutoVideoProcessor
 from transformers import AutoProcessor, AutoModelForCausalLM
@@ -33,10 +42,16 @@ from peft import PeftModel
 from sentence_transformers import SentenceTransformer
 
 # Episode Memory
-from episode_memory import EpisodeMemory
+try:
+    from .episode_memory import EpisodeMemory
+except ImportError:
+    from episode_memory import EpisodeMemory
 
 # Novelty Scoring
-from novelty_scorer import NoveltyScorer
+try:
+    from .novelty_scorer import NoveltyScorer
+except ImportError:
+    from novelty_scorer import NoveltyScorer
 
 # ============================================================================
 # DATA STRUCTURES
@@ -327,14 +342,187 @@ class SpatialTracker:
         """Check if two boxes overlap (with margin)"""
         x1_1, y1_1, x2_1, y2_1 = box1
         x1_2, y1_2, x2_2, y2_2 = box2
-        
+
         # Expand box1 by margin
         x1_1 -= margin
         y1_1 -= margin
         x2_1 += margin
         y2_1 += margin
-        
+
         return not (x2_1 < x1_2 or x2_2 < x1_1 or y2_1 < y1_2 or y2_2 < y1_1)
+
+# ============================================================================
+# ROLLING VISUAL BUFFER (for continuous listening)
+# ============================================================================
+
+@dataclass
+class BufferedFrame:
+    """Single frame with metadata in rolling buffer"""
+    frame: np.ndarray
+    embedding: torch.Tensor
+    timestamp: float
+    detections: List[Detection]
+
+
+class RollingVisualBuffer:
+    """
+    Thread-safe rolling buffer of recent frames with embeddings.
+
+    Runs continuous capture in background thread.
+    Main thread and voice thread can safely query for recent frames.
+    """
+
+    def __init__(
+        self,
+        cap: cv2.VideoCapture,
+        vjepa_encoder: 'VJEPAEncoder',
+        florence_detector: 'FlorenceDetector',
+        buffer_seconds: float = 3.0,
+        target_fps: float = 10.0,
+        detection_interval: int = 5
+    ):
+        self.cap = cap
+        self.vjepa = vjepa_encoder
+        self.florence = florence_detector
+
+        self.buffer_size = int(buffer_seconds * target_fps)
+        self.frame_interval = 1.0 / target_fps
+        self.detection_interval = detection_interval
+
+        self._buffer: deque = deque(maxlen=self.buffer_size)
+        self._lock = threading.Lock()
+        self._running = False
+        self._thread: Optional[threading.Thread] = None
+
+        # Cache latest detections
+        self._latest_detections: List[Detection] = []
+        self._frame_count = 0
+
+    def start(self):
+        """Start background capture"""
+        if self._running:
+            return
+        self._running = True
+        self._thread = threading.Thread(target=self._capture_loop, daemon=True)
+        self._thread.start()
+        print("  Rolling visual buffer started")
+
+    def stop(self):
+        """Stop background capture"""
+        self._running = False
+        if self._thread:
+            self._thread.join(timeout=2.0)
+            self._thread = None
+        print("  Rolling visual buffer stopped")
+
+    def _capture_loop(self):
+        """Background capture and embedding loop"""
+        frame_buffer = []
+
+        while self._running:
+            loop_start = time.time()
+
+            ret, frame = self.cap.read()
+            if not ret:
+                time.sleep(0.01)
+                continue
+
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frame_buffer.append(frame_rgb)
+
+            # Keep last 16 frames for V-JEPA
+            if len(frame_buffer) > 16:
+                frame_buffer.pop(0)
+
+            # Run Florence periodically
+            self._frame_count += 1
+            if self._frame_count % self.detection_interval == 0:
+                try:
+                    self._latest_detections = self.florence.detect(frame_rgb)
+                except Exception as e:
+                    print(f"  Buffer detection error: {e}")
+
+            # Generate embedding when we have enough frames
+            if len(frame_buffer) >= 16:
+                try:
+                    frames_array = np.array(frame_buffer)
+                    embedding = self.vjepa.encode_frames(frames_array)
+
+                    buffered = BufferedFrame(
+                        frame=frame_rgb.copy(),
+                        embedding=embedding.cpu(),
+                        timestamp=time.time(),
+                        detections=self._latest_detections.copy()
+                    )
+
+                    with self._lock:
+                        self._buffer.append(buffered)
+                except Exception as e:
+                    print(f"  Buffer embedding error: {e}")
+
+            # Maintain target FPS
+            elapsed = time.time() - loop_start
+            sleep_time = self.frame_interval - elapsed
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+
+    def get_frame_at_time(self, target_time: float) -> Optional[BufferedFrame]:
+        """Get the frame closest to target_time. Thread-safe."""
+        with self._lock:
+            if not self._buffer:
+                return None
+
+            closest = min(self._buffer, key=lambda f: abs(f.timestamp - target_time))
+
+            return BufferedFrame(
+                frame=closest.frame.copy(),
+                embedding=closest.embedding.clone(),
+                timestamp=closest.timestamp,
+                detections=closest.detections.copy()
+            )
+
+    def get_latest(self) -> Optional[BufferedFrame]:
+        """Get most recent frame. Thread-safe."""
+        with self._lock:
+            if not self._buffer:
+                return None
+            latest = self._buffer[-1]
+            return BufferedFrame(
+                frame=latest.frame.copy(),
+                embedding=latest.embedding.clone(),
+                timestamp=latest.timestamp,
+                detections=latest.detections.copy()
+            )
+
+    def get_frames_in_range(self, start_time: float, end_time: float) -> List[BufferedFrame]:
+        """Get all frames in time range. Thread-safe."""
+        with self._lock:
+            return [
+                BufferedFrame(
+                    frame=f.frame.copy(),
+                    embedding=f.embedding.clone(),
+                    timestamp=f.timestamp,
+                    detections=f.detections.copy()
+                )
+                for f in self._buffer
+                if start_time <= f.timestamp <= end_time
+            ]
+
+
+# ============================================================================
+# LAST RECOGNITION STATE (for corrections/confirmations)
+# ============================================================================
+
+@dataclass
+class LastRecognition:
+    """Tracks the most recent identification for corrections/confirmations"""
+    name: str
+    category: str
+    confidence: float
+    bbox: Tuple[int, int, int, int]
+    timestamp: float
+    embedding: torch.Tensor
+
 
 # ============================================================================
 # OBJECT MEMORY STORE
@@ -343,7 +531,7 @@ class SpatialTracker:
 class MemoryStore:
     """Stores and retrieves learned object knowledge"""
     
-    def __init__(self, save_path: str = "object_memory_integrated.json"):
+    def __init__(self, save_path: str = "data/object_memory_integrated.json"):
         self.save_path = save_path
         self.embeddings_path = save_path.replace('.json', '_embeddings.pt')
         self.objects: Dict[str, ObjectMemory] = {}
@@ -677,11 +865,15 @@ class TrainingDataCollector:
 
 class VoiceInterface:
     """Handles speech recognition"""
-    
-    def __init__(self):
-        print("  Loading Whisper...")
-        self.whisper = whisper.load_model("small")
-        print("  ✓ Whisper loaded")
+
+    def __init__(self, whisper_model=None):
+        if whisper_model is not None:
+            self.whisper = whisper_model
+            print("  VoiceInterface using shared Whisper model")
+        else:
+            print("  Loading Whisper...")
+            self.whisper = whisper.load_model("small")
+            print("  Whisper loaded")
     
     def ask(self, question: str) -> str:
         """Ask a question and get voice response"""
@@ -862,28 +1054,34 @@ class FocusSelector:
 
 class WorkshopJARVIS:
     """Integrated Florence + V-JEPA Workshop Assistant"""
-    
-    def __init__(self):
+
+    def __init__(self, continuous_listening: bool = True):
         print("=" * 70)
-        print("WORKSHOP JARVIS - Integrated Vision System v2")
-        print("  (with spatial persistence)")
+        print("WORKSHOP JARVIS - Integrated Vision System v3")
+        print("  (with continuous listening)")
         print("=" * 70)
         print("\nInitializing...")
-        
+
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         print(f"  Device: {self.device}")
-        
+
         # Load models
         self.florence = FlorenceDetector(self.device)
-        
+
         self.vjepa = VJEPAEncoder(
             "./models/base/vjepa2",
             "./models/adapters/workshop_lora_20260117_041817",
             self.device
         )
-        
-        self.voice = VoiceInterface()
-        
+
+        # Shared Whisper model
+        print("  Loading Whisper small...")
+        self.whisper_model = whisper.load_model("small")
+        print("  Whisper loaded")
+
+        # Legacy voice interface (uses shared model)
+        self.voice = VoiceInterface(whisper_model=self.whisper_model)
+
         # Memory, focus, and tracking
         self.memory = MemoryStore()
         self.focus = FocusSelector()
@@ -891,18 +1089,28 @@ class WorkshopJARVIS:
         self.training_collector = TrainingDataCollector()
         self.episodes = EpisodeMemory()
         self.novelty = NoveltyScorer()
-        
+
         # Camera
         self.cap = None
         self.frame_buffer = []
-        
+
+        # Continuous listening components
+        self.continuous_listening_enabled = continuous_listening
+        self.voice_event_queue: queue.Queue = queue.Queue()
+        self.listener: Optional[ContinuousListener] = None
+        self.visual_buffer: Optional[RollingVisualBuffer] = None
+
+        # Last recognition state (for corrections/confirmations)
+        self.last_recognition: Optional[LastRecognition] = None
+        self._last_recognition_lock = threading.Lock()
+
         # Load previous memory
         loaded = self.memory.load()
         if loaded:
-            print(f"\n✓ Loaded {loaded} objects from memory:")
+            print(f"\n  Loaded {loaded} objects from memory:")
             for name, obj in self.memory.objects.items():
                 print(f"    - {name} ({obj.category}, {len(obj.embeddings)} views)")
-        
+
         print("\n" + "=" * 70)
     
     def _draw_debug_frame(self, frame: np.ndarray, detections: List[Detection], 
@@ -960,17 +1168,37 @@ class WorkshopJARVIS:
         """Main loop"""
         print("\nWorkshop Vision System Active")
         print("Show me objects and I'll learn to recognize them!")
+        if self.continuous_listening_enabled:
+            print("Continuous listening ENABLED - just speak naturally")
         print("Press Ctrl+C to stop")
         print("Debug window will show detections\n")
-        
+
         self.cap = cv2.VideoCapture(0)
-        
+
+        # Start continuous listening components
+        if self.continuous_listening_enabled:
+            self.visual_buffer = RollingVisualBuffer(
+                cap=self.cap,
+                vjepa_encoder=self.vjepa,
+                florence_detector=self.florence
+            )
+            self.visual_buffer.start()
+
+            self.listener = ContinuousListener(
+                whisper_model=self.whisper_model,
+                event_queue=self.voice_event_queue
+            )
+            self.listener.start()
+
         # Create debug window
         cv2.namedWindow("JARVIS Debug", cv2.WINDOW_NORMAL)
         cv2.resizeWindow("JARVIS Debug", 960, 720)
-        
+
         try:
             while True:
+                # Process voice events if continuous listening enabled
+                if self.continuous_listening_enabled:
+                    self._process_voice_events()
                 print("-" * 50)
                 
                 # Capture frames for V-JEPA (need 64)
@@ -1080,7 +1308,8 @@ class WorkshopJARVIS:
                             'bbox': focus_obj.bbox,
                             'is_focus': True
                         }],
-                        event_type="observation"
+                        event_type="observation",
+                        embedding=scene_emb.cpu().numpy()
                     )
                     print(f"     [Episode recorded]")  # ADD THIS LINE
                     
@@ -1186,6 +1415,14 @@ class WorkshopJARVIS:
                     print(f"     This will help me learn when Florence misclassifies!")
                     
                     # Record as misclassification episode for training
+                    # Capture fresh frames and scene embedding for this misclassification
+                    fresh_frames = self._capture_frames(64)
+                    if fresh_frames is not None:
+                        fresh_scene_emb = self.vjepa.encode_frames(fresh_frames)
+                        misclass_embedding = fresh_scene_emb.cpu().numpy()
+                    else:
+                        misclass_embedding = None
+                    
                     self.episodes.record_episode(
                         objects=[{
                             'name': name,
@@ -1196,7 +1433,8 @@ class WorkshopJARVIS:
                             'is_focus': True
                         }],
                         event_type="misclassification",
-                        event_detail=f"Florence classified '{name}' as '{detection.label}' but it's actually a '{existing_obj.category}'"
+                        event_detail=f"Florence classified '{name}' as '{detection.label}' but it's actually a '{existing_obj.category}'",
+                        embedding=misclass_embedding
                     )
                     print(f"     [Misclassification episode recorded for training]")
                 
@@ -1358,7 +1596,15 @@ class WorkshopJARVIS:
         self.tracker.stop_tracking()
         print(f"     ✓ Learned '{name}' with {views_captured} views")
         
-        # Record learning episode
+        # Record learning episode with scene embedding
+        # Capture final frames and embedding for this learning session
+        final_frames = self._capture_frames(64)
+        if final_frames is not None:
+            final_scene_emb = self.vjepa.encode_frames(final_frames)
+            learning_embedding = final_scene_emb.cpu().numpy()
+        else:
+            learning_embedding = None
+        
         self.episodes.record_episode(
             objects=[{
                 'name': name,
@@ -1368,7 +1614,8 @@ class WorkshopJARVIS:
                 'is_focus': True
             }],
             event_type="learning",
-            event_detail=f"Learned new object '{name}' with {views_captured} views"
+            event_detail=f"Learned new object '{name}' with {views_captured} views",
+            embedding=learning_embedding
         )
     
     def _spatial_learning_loop(self, name: str, category: str, initial_bbox: Tuple[int, int, int, int],
@@ -1490,7 +1737,15 @@ class WorkshopJARVIS:
         self.tracker.stop_tracking()
         print(f"     ✓ Learned '{name}' with {views_captured} views")
         
-        # Record learning episode
+        # Record learning episode with scene embedding
+        # Capture final frames and embedding for this learning session
+        final_frames = self._capture_frames(64)
+        if final_frames is not None:
+            final_scene_emb = self.vjepa.encode_frames(final_frames)
+            learning_embedding = final_scene_emb.cpu().numpy()
+        else:
+            learning_embedding = None
+        
         self.episodes.record_episode(
             objects=[{
                 'name': name,
@@ -1500,7 +1755,8 @@ class WorkshopJARVIS:
                 'is_focus': True
             }],
             event_type="learning",
-            event_detail=f"Learned object '{name}' with {views_captured} views"
+            event_detail=f"Learned object '{name}' with {views_captured} views",
+            embedding=learning_embedding
         )
     
     def _correct_recognition(self, detection: Detection, embedding: torch.Tensor,
@@ -1625,7 +1881,15 @@ class WorkshopJARVIS:
         
         print(f"\n  ✓ Correction complete: '{wrong_name}' → '{correct_name}'")
         
-        # Record correction episode
+        # Record correction episode with scene embedding
+        # Capture final frames and embedding for this correction
+        correction_frames = self._capture_frames(64)
+        if correction_frames is not None:
+            correction_scene_emb = self.vjepa.encode_frames(correction_frames)
+            correction_embedding = correction_scene_emb.cpu().numpy()
+        else:
+            correction_embedding = None
+        
         self.episodes.record_episode(
             objects=[{
                 'name': correct_name,
@@ -1635,28 +1899,334 @@ class WorkshopJARVIS:
                 'is_focus': True
             }],
             event_type="correction",
-            event_detail=f"Corrected misidentification from '{wrong_name}' to '{correct_name}'"
+            event_detail=f"Corrected misidentification from '{wrong_name}' to '{correct_name}'",
+            embedding=correction_embedding
         )
     
     def _shutdown(self):
         """Clean shutdown"""
         print("\n\nShutting down...")
-        
+
+        # Stop continuous listening components
+        if self.listener:
+            self.listener.stop()
+        if self.visual_buffer:
+            self.visual_buffer.stop()
+
         if self.cap:
             self.cap.release()
         cv2.destroyAllWindows()
         cv2.waitKey(1)  # Ensure windows close
-        
+
         self.memory.save()
         self.episodes.save()
         self.episodes.print_summary()
-        
+
         # Save training data for overnight learning
         self.training_collector.save_session()
-        
+
         print(f"\nKnown objects:")
         for name, obj in self.memory.objects.items():
             print(f"  - {name} ({obj.category}, {len(obj.embeddings)} views, seen {obj.times_seen}x)")
+
+    # ========================================================================
+    # CONTINUOUS LISTENING HANDLERS
+    # ========================================================================
+
+    def _set_last_recognition(self, name: str, category: str, confidence: float,
+                               bbox: Tuple, embedding: torch.Tensor):
+        """Thread-safe update of last recognition"""
+        with self._last_recognition_lock:
+            self.last_recognition = LastRecognition(
+                name=name,
+                category=category,
+                confidence=confidence,
+                bbox=bbox,
+                timestamp=time.time(),
+                embedding=embedding.clone()
+            )
+
+    def _get_last_recognition(self) -> Optional[LastRecognition]:
+        """Thread-safe read of last recognition"""
+        with self._last_recognition_lock:
+            if self.last_recognition is None:
+                return None
+            return LastRecognition(
+                name=self.last_recognition.name,
+                category=self.last_recognition.category,
+                confidence=self.last_recognition.confidence,
+                bbox=self.last_recognition.bbox,
+                timestamp=self.last_recognition.timestamp,
+                embedding=self.last_recognition.embedding.clone()
+            )
+
+    def _process_voice_events(self):
+        """Process queued voice events from listener"""
+        while True:
+            try:
+                event = self.voice_event_queue.get_nowait()
+            except queue.Empty:
+                break
+
+            self._handle_voice_event(event)
+
+    def _handle_voice_event(self, event: VoiceEvent):
+        """Route voice events to appropriate handlers"""
+        # Get visual context from ~1.5 seconds before speech ended
+        lookback_time = event.timestamp - 1.5
+        visual_context = self.visual_buffer.get_frame_at_time(lookback_time)
+
+        if visual_context is None:
+            print("  No visual context available")
+            return
+
+        if event.intent == Intent.IDENTIFY:
+            self._handle_identify(visual_context)
+
+        elif event.intent == Intent.TEACH:
+            if event.extracted_name:
+                self._handle_teach(event.extracted_name, visual_context)
+            else:
+                print(f"  Couldn't parse object name from: '{event.transcript}'")
+
+        elif event.intent == Intent.CORRECT:
+            if event.extracted_name:
+                self._handle_correct(event.extracted_name)
+            else:
+                print(f"  Couldn't parse correction from: '{event.transcript}'")
+
+        elif event.intent == Intent.CONFIRM:
+            self._handle_confirm()
+
+    def _handle_identify(self, context: BufferedFrame):
+        """Handle 'what's this?' queries"""
+        # Find focused object from detections
+        focus_obj = self.focus.select_focus(
+            context.detections,
+            context.frame.shape,
+            novelty_scorer=self.novelty,
+            episode_memory=self.episodes,
+            memory_store=self.memory,
+            vjepa_encoder=self.vjepa,
+            frames=np.array([context.frame])
+        )
+
+        if not focus_obj:
+            print("  I don't see anything specific to identify")
+            return
+
+        # Get embedding for this region
+        frames_for_embed = self._get_frames_for_embedding(context.timestamp)
+        embedding = self.vjepa.encode_region(frames_for_embed, focus_obj.bbox)
+
+        # Try to match
+        match_name, confidence = self.memory.find_match(
+            focus_obj.label, embedding, episode_memory=self.episodes
+        )
+
+        if match_name:
+            print(f"\n  That's your **{match_name}** (confidence: {confidence:.2f})")
+            self._set_last_recognition(
+                match_name, focus_obj.label, confidence,
+                focus_obj.bbox, embedding
+            )
+
+            # Record observation episode
+            self.episodes.record_episode(
+                objects=[{
+                    'name': match_name,
+                    'category': focus_obj.label,
+                    'confidence': confidence,
+                    'bbox': focus_obj.bbox,
+                    'is_focus': True
+                }],
+                event_type="observation",
+                event_detail=f"Identified '{match_name}' via voice query"
+            )
+        else:
+            print(f"\n  I see a {focus_obj.label}, but I don't recognize which specific one")
+            print(f"  Say 'this is called [name]' to teach me")
+
+    def _handle_teach(self, object_name: str, context: BufferedFrame):
+        """Handle 'this is called X' teaching"""
+        # Find focused object
+        focus_obj = self.focus.select_focus(
+            context.detections,
+            context.frame.shape
+        )
+
+        if not focus_obj:
+            print(f"  I don't see an object to learn as '{object_name}'")
+            return
+
+        # Get embedding
+        frames_for_embed = self._get_frames_for_embedding(context.timestamp)
+        embedding = self.vjepa.encode_region(frames_for_embed, focus_obj.bbox)
+
+        # Check if name already exists
+        if object_name in self.memory.objects:
+            existing = self.memory.objects[object_name]
+            if existing.category != focus_obj.label:
+                print(f"\n  Adding view to existing '{object_name}'")
+                print(f"  (Note: Florence sees '{focus_obj.label}' but I know it as '{existing.category}')")
+
+                # Record misclassification episode
+                self.episodes.record_episode(
+                    objects=[{
+                        'name': object_name,
+                        'category': focus_obj.label,
+                        'known_category': existing.category,
+                        'confidence': 1.0,
+                        'bbox': focus_obj.bbox,
+                        'is_focus': True
+                    }],
+                    event_type="misclassification",
+                    event_detail=f"Florence classified '{object_name}' as '{focus_obj.label}' but it's '{existing.category}'"
+                )
+            else:
+                print(f"\n  Adding view to existing '{object_name}'")
+
+            self.memory.add_object(object_name, existing.category, embedding)
+        else:
+            # New object
+            self.memory.add_object(object_name, focus_obj.label, embedding)
+            print(f"\n  Learned: **{object_name}** (category: {focus_obj.label})")
+
+        # Update last recognition
+        self._set_last_recognition(
+            object_name, focus_obj.label, 1.0,
+            focus_obj.bbox, embedding
+        )
+
+        # Record learning episode
+        self.episodes.record_episode(
+            objects=[{
+                'name': object_name,
+                'category': focus_obj.label,
+                'confidence': 1.0,
+                'bbox': focus_obj.bbox,
+                'is_focus': True
+            }],
+            event_type="learning",
+            event_detail=f"Learned '{object_name}' via voice teaching"
+        )
+
+        # Record training data
+        latest = self.visual_buffer.get_latest()
+        if latest:
+            self.training_collector.record_frame(
+                latest.frame, focus_obj.bbox, object_name, focus_obj.label,
+                confirmed=True
+            )
+
+    def _handle_correct(self, correct_name: str):
+        """Handle 'no, that's X' corrections"""
+        last = self._get_last_recognition()
+
+        if last is None:
+            print("  Nothing to correct - I haven't identified anything recently")
+            return
+
+        # Check if correction is recent enough (within 30 seconds)
+        if time.time() - last.timestamp > 30:
+            print("  Too long since last identification - please show me the object again")
+            return
+
+        wrong_name = last.name
+
+        print(f"\n  Correcting: '{wrong_name}' -> '{correct_name}'")
+
+        # Remove bad embedding from wrong object (if it has multiple)
+        if wrong_name in self.memory.objects:
+            obj = self.memory.objects[wrong_name]
+            if len(obj.embeddings) > 1:
+                max_sim = -1
+                max_idx = -1
+                for i, stored_emb in enumerate(obj.embeddings):
+                    sim = torch.cosine_similarity(
+                        last.embedding.cpu().flatten().unsqueeze(0),
+                        stored_emb.flatten().unsqueeze(0)
+                    ).item()
+                    if sim > max_sim:
+                        max_sim = sim
+                        max_idx = i
+
+                if max_idx >= 0:
+                    obj.embeddings.pop(max_idx)
+                    print(f"  Removed confusing view from '{wrong_name}'")
+
+        # Add to correct object
+        self.memory.add_object(correct_name, last.category, last.embedding)
+        print(f"  Added view to '{correct_name}'")
+
+        # Update last recognition
+        self._set_last_recognition(
+            correct_name, last.category, 1.0,
+            last.bbox, last.embedding
+        )
+
+        # Record correction episode
+        self.episodes.record_episode(
+            objects=[{
+                'name': correct_name,
+                'category': last.category,
+                'confidence': 1.0,
+                'bbox': last.bbox,
+                'is_focus': True
+            }],
+            event_type="correction",
+            event_detail=f"Corrected '{wrong_name}' to '{correct_name}' via voice"
+        )
+
+    def _handle_confirm(self):
+        """Handle 'yes'/'correct' confirmations"""
+        last = self._get_last_recognition()
+
+        if last is None:
+            print("  Nothing to confirm")
+            return
+
+        if time.time() - last.timestamp > 30:
+            print("  Too long since last identification")
+            return
+
+        # Strengthen the recognition by adding another embedding if confidence was low
+        if last.confidence < 0.95:
+            self.memory.add_object(last.name, last.category, last.embedding)
+            print(f"\n  Confirmed: **{last.name}** (strengthened memory)")
+        else:
+            print(f"\n  Confirmed: **{last.name}**")
+
+        # Record confirmation episode
+        self.episodes.record_episode(
+            objects=[{
+                'name': last.name,
+                'category': last.category,
+                'confidence': last.confidence,
+                'bbox': last.bbox,
+                'is_focus': True
+            }],
+            event_type="confirmation",
+            event_detail=f"User confirmed identification of '{last.name}'"
+        )
+
+    def _get_frames_for_embedding(self, target_time: float) -> np.ndarray:
+        """Get multiple frames around target time for V-JEPA embedding"""
+        frames = self.visual_buffer.get_frames_in_range(
+            target_time - 0.5, target_time
+        )
+
+        if len(frames) >= 8:
+            return np.array([f.frame for f in frames[-16:]])
+        else:
+            # Fallback: duplicate the frame we have
+            if frames:
+                frame = frames[-1].frame
+            else:
+                latest = self.visual_buffer.get_latest()
+                frame = latest.frame if latest else np.zeros((480, 640, 3), dtype=np.uint8)
+            return np.array([frame] * 16)
+
 
 # ============================================================================
 # ENTRY POINT

@@ -275,7 +275,7 @@ class ObjectMemory:
         
         return best_name, best_score, margin
     
-    def save(self, path: str = "object_memory.json"):
+    def save(self, path: str = "data/object_memory.json"):
         data = {}
         for name, obj in self.objects.items():
             data[name] = {
@@ -287,7 +287,7 @@ class ObjectMemory:
         with open(path, 'w') as f:
             json.dump(data, f, indent=2)
     
-    def load(self, path: str = "object_memory.json") -> int:
+    def load(self, path: str = "data/object_memory.json") -> int:
         try:
             with open(path, 'r') as f:
                 data = json.load(f)

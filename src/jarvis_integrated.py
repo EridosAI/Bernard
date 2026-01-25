@@ -223,7 +223,7 @@ class VJEPAEncoder:
 class MemoryStore:
     """Stores and retrieves learned object knowledge"""
     
-    def __init__(self, save_path: str = "object_memory_integrated.json"):
+    def __init__(self, save_path: str = "data/object_memory_integrated.json"):
         self.save_path = save_path
         self.embeddings_path = save_path.replace('.json', '_embeddings.pt')
         self.objects: Dict[str, ObjectMemory] = {}
