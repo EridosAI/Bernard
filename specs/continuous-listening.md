@@ -9,7 +9,7 @@ Natural voice interaction without button presses or wake words. Enables faster e
 
 ## Prerequisites
 
-Before implementing this module, the following changes to `jarvis_integrated_v2.py` are required:
+Before implementing this module, the following changes to `arnold_integrated_v2.py` are required:
 
 1. **Rolling visual buffer** - Background thread continuously capturing frames with timestamps
 2. **Shared Whisper model** - Extract from VoiceInterface for reuse
@@ -313,10 +313,10 @@ For streaming implementation:
 
 ### 4. Whisper setup (shared model)
 
-The main `WorkshopJARVIS` class will own the Whisper model:
+The main `WorkshopArnold` class will own the Whisper model:
 
 ```python
-# In WorkshopJARVIS.__init__
+# In WorkshopArnold.__init__
 self.whisper_model = whisper.load_model("base")  # Shared instance
 self.voice = VoiceInterface(whisper_model=self.whisper_model)  # Pass to existing
 self.listener = ContinuousListener(
@@ -366,7 +366,7 @@ def _process_utterance(self, audio_buffer: np.ndarray, speech_end_time: float):
 
 ### 5. Rolling Visual Buffer (new component)
 
-Add to `jarvis_integrated_v2.py`:
+Add to `arnold_integrated_v2.py`:
 
 ```python
 import threading
@@ -528,7 +528,7 @@ class RollingVisualBuffer:
 
 ### 6. Last Recognition State
 
-Add to `WorkshopJARVIS`:
+Add to `WorkshopArnold`:
 
 ```python
 @dataclass
@@ -542,7 +542,7 @@ class LastRecognition:
     embedding: torch.Tensor      # For correction training
 
 
-class WorkshopJARVIS:
+class WorkshopArnold:
     def __init__(self, ...):
         ...
         # Last recognition state (for corrections/confirmations)
@@ -580,13 +580,13 @@ class WorkshopJARVIS:
 
 ### 7. Integration with main system
 
-Updated integration in `jarvis_integrated_v2.py`:
+Updated integration in `arnold_integrated_v2.py`:
 
 ```python
 import queue
 from continuous_listening import ContinuousListener, Intent, VoiceEvent
 
-class WorkshopJARVIS:
+class WorkshopArnold:
     def __init__(self, ...):
         ...
         # Voice event queue (thread-safe communication)

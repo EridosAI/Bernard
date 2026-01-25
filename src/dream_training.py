@@ -571,7 +571,7 @@ def train(config: TrainingConfig, session_filter: str = None):
         print(f"⚠ No episode memory found at {episode_memory_path}")
     
     print("\n" + "=" * 50)
-    print(f"To use the new model, update the adapter path in jarvis_integrated_v2.py:")
+    print(f"To use the new model, update the adapter path in arnold_integrated_v2.py:")
     print(f'  adapter_path = "{output_path}"')
 
 # ============================================================================

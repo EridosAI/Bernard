@@ -1,6 +1,6 @@
 # Implement Specification
 
-You are implementing a specification for the Protégé project. The spec is: $ARGUMENTS
+You are implementing a specification for the Arnold project. The spec is: $ARGUMENTS
 
 ## Process
 

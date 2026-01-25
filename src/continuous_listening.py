@@ -1,4 +1,4 @@
-# continuous_listening.py - Always-on voice pipeline for JARVIS
+# continuous_listening.py - Always-on voice pipeline for Arnold
 """
 VAD -> Whisper -> Intent classification pipeline.
 Runs in background thread, queues events for main thread.

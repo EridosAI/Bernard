@@ -1,9 +1,11 @@
-# Protégé - Core modules
+# Arnold - Core modules
 """
-Core modules for the Protégé workshop assistant.
+Core modules for the Arnold workshop assistant.
+
+Arnold = Associative Recognition Network for Observation-Linked Development
 
 Main entry points:
-    - jarvis_integrated_v2: Main orchestration loop
+    - arnold_integrated_v2: Main orchestration loop
     - dream_training: Overnight LoRA training
     - workshop_session: Interactive teaching sessions
 

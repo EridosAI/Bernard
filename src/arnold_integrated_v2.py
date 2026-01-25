@@ -1,4 +1,4 @@
-# jarvis_integrated.py - Florence-2 + V-JEPA Integrated System
+# arnold_integrated.py - Florence-2 + V-JEPA Integrated System
 """
 Two-layer architecture:
   Layer 1: Florence-2 - General world knowledge (what objects are in scene)
@@ -877,7 +877,7 @@ class VoiceInterface:
     
     def ask(self, question: str) -> str:
         """Ask a question and get voice response"""
-        print(f"\n🤖 JARVIS: {question}")
+        print(f"\n🤖 ARNOLD: {question}")
         input("   Press ENTER when ready to speak...")
         
         p = pyaudio.PyAudio()
@@ -1052,12 +1052,12 @@ class FocusSelector:
 # MAIN INTEGRATED SYSTEM
 # ============================================================================
 
-class WorkshopJARVIS:
+class WorkshopArnold:
     """Integrated Florence + V-JEPA Workshop Assistant"""
 
     def __init__(self, continuous_listening: bool = True):
         print("=" * 70)
-        print("WORKSHOP JARVIS - Integrated Vision System v3")
+        print("WORKSHOP ARNOLD - Integrated Vision System v3")
         print("  (with continuous listening)")
         print("=" * 70)
         print("\nInitializing...")
@@ -1191,8 +1191,8 @@ class WorkshopJARVIS:
             self.listener.start()
 
         # Create debug window
-        cv2.namedWindow("JARVIS Debug", cv2.WINDOW_NORMAL)
-        cv2.resizeWindow("JARVIS Debug", 960, 720)
+        cv2.namedWindow("Arnold Debug", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow("Arnold Debug", 960, 720)
 
         try:
             while True:
@@ -1229,7 +1229,7 @@ class WorkshopJARVIS:
                     display = cv2.cvtColor(current_frame.copy(), cv2.COLOR_RGB2BGR)
                     cv2.putText(display, "No objects detected", (10, 30),
                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                    cv2.imshow("JARVIS Debug", display)
+                    cv2.imshow("Arnold Debug", display)
                     cv2.waitKey(1)
                     time.sleep(1)
                     continue
@@ -1248,7 +1248,7 @@ class WorkshopJARVIS:
                 if not focus_obj:
                     print("     Nothing to focus on")
                     display = self._draw_debug_frame(current_frame, detections)
-                    cv2.imshow("JARVIS Debug", display)
+                    cv2.imshow("Arnold Debug", display)
                     cv2.waitKey(1)
                     time.sleep(1)
                     continue
@@ -1290,7 +1290,7 @@ class WorkshopJARVIS:
                     current_frame, detections, focus_obj, 
                     (match_name, confidence) if match_name else None
                 )
-                cv2.imshow("JARVIS Debug", display)
+                cv2.imshow("Arnold Debug", display)
                 cv2.waitKey(1)
                 
                 if match_name:
@@ -1509,7 +1509,7 @@ class WorkshopJARVIS:
                        (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
             cv2.putText(display, "Click here + press 'q' to stop", 
                        (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 1)
-            cv2.imshow("JARVIS Debug", display)
+            cv2.imshow("Arnold Debug", display)
             
             # Check if Florence can still see this category
             category_detections = [d for d in detections if d.label == detection.label]
@@ -1657,7 +1657,7 @@ class WorkshopJARVIS:
                        (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
             cv2.putText(display, "Click here + press 'q' to stop", 
                        (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 1)
-            cv2.imshow("JARVIS Debug", display)
+            cv2.imshow("Arnold Debug", display)
             
             # Check if Florence can still see the category
             category_detections = [d for d in detections if d.label == category]
@@ -1851,7 +1851,7 @@ class WorkshopJARVIS:
                 display = self._draw_debug_frame(frames[-1], detections, None, None)
                 cv2.putText(display, f"CORRECTING: {correct_name} ({views_captured}/{max_views})", 
                            (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 165, 255), 2)
-                cv2.imshow("JARVIS Debug", display)
+                cv2.imshow("Arnold Debug", display)
                 
                 tracked_bbox = self.tracker.update(detections)
                 
@@ -2233,5 +2233,5 @@ class WorkshopJARVIS:
 # ============================================================================
 
 if __name__ == "__main__":
-    jarvis = WorkshopJARVIS()
-    jarvis.run()
+    arnold = WorkshopArnold()
+    arnold.run()

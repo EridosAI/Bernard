@@ -11,7 +11,7 @@ from sentence_transformers import SentenceTransformer
 cv2.setNumThreads(4)
 
 print("="*70)
-print("WORKSHOP JARVIS - Inference Test")
+print("WORKSHOP ARNOLD - Inference Test")
 print("="*70)
 
 # Load trained model

@@ -10,7 +10,7 @@ Learning doesn't require labels. It requires prediction error.
 
 When you predict what will happen and something different happens, that gap is information. It tells you your model of the world is wrong in a specific way. Correct the model, and you've learned.
 
-This is how Protégé learns — not from curated datasets with human annotations, but from the continuous stream of predictions and outcomes that come from living in the workshop.
+This is how Arnold learns — not from curated datasets with human annotations, but from the continuous stream of predictions and outcomes that come from living in the workshop.
 
 ---
 
@@ -22,7 +22,7 @@ This is how Protégé learns — not from curated datasets with human annotation
 Predict → Wait → Observe → Compare
 ```
 
-I'm about to plug in a power supply. Protégé predicts what will happen — the LED will light up, the fan will spin, nothing will explode.
+I'm about to plug in a power supply. Arnold predicts what will happen — the LED will light up, the fan will spin, nothing will explode.
 
 Then reality arrives.
 
@@ -38,7 +38,7 @@ Observe surprise → Search for cause → Hypothesize → Get feedback
 
 Something unexpected happens — a component fails, a measurement is wrong, a tool isn't where it should be.
 
-Protégé searches recent memories for plausible causes. What happened before this? What objects are involved? What patterns match?
+Arnold searches recent memories for plausible causes. What happened before this? What objects are involved? What patterns match?
 
 It forms a hypothesis: "Would this be explained by the unprotected wire from Tuesday?"
 
@@ -57,11 +57,11 @@ There's a temptation to do attribution silently — form a hypothesis, check it 
 
 But vocalization is powerful.
 
-When Protégé speaks its hypothesis out loud, it commits to a specific answer *before* getting feedback. This commitment makes the learning signal stronger.
+When Arnold speaks its hypothesis out loud, it commits to a specific answer *before* getting feedback. This commitment makes the learning signal stronger.
 
 The same mechanism is documented in human learning: students who commit to an answer before seeing the solution learn faster than passive observers. The act of commitment creates sharper error signals.
 
-It also gives me a window into the system's reasoning. When Protégé says "I think this happened because X," I see how it's building causal models. Transparency comes free.
+It also gives me a window into the system's reasoning. When Arnold says "I think this happened because X," I see how it's building causal models. Transparency comes free.
 
 ---
 
@@ -90,7 +90,7 @@ Traditional supervised learning needs someone to annotate: "this image contains 
 
 Prediction-based learning generates its own signal. The world provides feedback by simply being what it is. Predict, observe, compare. No human annotator needed.
 
-This is crucial for Protégé's continuous learning. I can't label every frame of video from my workshop. But I don't need to — the system learns from the structure of what happens, not from my descriptions of it.
+This is crucial for Arnold's continuous learning. I can't label every frame of video from my workshop. But I don't need to — the system learns from the structure of what happens, not from my descriptions of it.
 
 ---
 
@@ -100,7 +100,7 @@ Prediction error doesn't just update the world model — it creates memories.
 
 High prediction error = surprising event = worth remembering.
 
-This is why the NoveltyScorer is central to Protégé's architecture. It detects when something is unexpected, which triggers both:
+This is why the NoveltyScorer is central to Arnold's architecture. It detects when something is unexpected, which triggers both:
 1. Storage of a new episode (this is worth remembering)
 2. Potential learning update (the model needs adjustment)
 
@@ -113,16 +113,16 @@ Low prediction error = expected event = maybe not worth storing. The world is be
 ```
 [I plug in a device; it doesn't turn on]
 
-Protégé: "That's unexpected — I thought it would power on."
+Arnold: "That's unexpected — I thought it would power on."
          (prediction error detected)
 
-Protégé: "Could this be related to the power supply we tested
+Arnold: "Could this be related to the power supply we tested
           yesterday that was giving inconsistent readings?"
          (hypothesis formed from recent memory)
 
 Me: "Good thinking, but actually I forgot to flip the switch."
 
-Protégé: [updates model: check for simple causes before complex ones]
+Arnold: [updates model: check for simple causes before complex ones]
          [slight negative weight on "faulty power supply" hypothesis]
          [stores this episode as example of user-error pattern]
 ```
@@ -150,7 +150,7 @@ What I find elegant about this:
 
 ## Open Questions
 
-- **Threshold for vocalization:** When should Protégé speak a hypothesis vs. resolve it internally? Too much vocalization is annoying; too little loses the transparency benefit.
+- **Threshold for vocalization:** When should Arnold speak a hypothesis vs. resolve it internally? Too much vocalization is annoying; too little loses the transparency benefit.
 - **Hypothesis search:** How does the system efficiently search memory for plausible causes? Current implementation is simple; could be more sophisticated.
 - **Negative evidence:** How to learn from "X didn't happen" — the absence of expected events?
 

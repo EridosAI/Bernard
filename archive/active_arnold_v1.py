@@ -1,4 +1,4 @@
-# active_jarvis_v1.py - Simplified active learning prototype
+# active_arnold_v1.py - Simplified active learning prototype
 import cv2
 import torch
 import whisper
@@ -11,7 +11,7 @@ import numpy as np
 import time
 
 print("="*70)
-print("ACTIVE JARVIS - Prototype v1")
+print("ACTIVE ARNOLD - Prototype v1")
 print("="*70)
 
 # Load models
@@ -106,7 +106,7 @@ def find_match(vision_emb):
 
 def ask_question(question):
     """Ask via text, get voice answer"""
-    print(f"\n🤖 JARVIS: {question}")
+    print(f"\n🤖 ARNOLD: {question}")
     
     # Record answer
     p = pyaudio.PyAudio()
@@ -143,7 +143,7 @@ def ask_question(question):
 
 # Main loop
 print("\nStarting active monitoring...")
-print("JARVIS will watch and ask questions when uncertain\n")
+print("Arnold will watch and ask questions when uncertain\n")
 
 try:
     while True:
@@ -181,5 +181,5 @@ try:
         time.sleep(10)
 
 except KeyboardInterrupt:
-    print("\n\nStopping JARVIS...")
+    print("\n\nStopping Arnold...")
     print(f"Learned {len(known_objects)} objects: {list(known_objects.keys())}")

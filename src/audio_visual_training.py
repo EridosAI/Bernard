@@ -262,7 +262,7 @@ class AudioVisualTrainer:
         sys.path.insert(0, str(Path(__file__).parent))
 
         try:
-            from jarvis_integrated_v2 import VJEPAEncoder
+            from arnold_integrated_v2 import VJEPAEncoder
             self.vjepa_encoder = VJEPAEncoder(
                 self.config.vjepa_path,
                 self.config.vjepa_adapter_path,
@@ -274,7 +274,7 @@ class AudioVisualTrainer:
             self.vjepa_encoder = self._create_minimal_vjepa_encoder()
 
     def _create_minimal_vjepa_encoder(self):
-        """Create minimal V-JEPA encoder without full jarvis integration"""
+        """Create minimal V-JEPA encoder without full arnold integration"""
         from transformers import AutoModel, AutoVideoProcessor
         from peft import PeftModel
 

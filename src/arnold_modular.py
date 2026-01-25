@@ -1,4 +1,4 @@
-# jarvis_modular.py - Continuous Learning Architecture
+# arnold_modular.py - Continuous Learning Architecture
 import cv2
 import torch
 import torch.nn as nn
@@ -350,7 +350,7 @@ class VoiceInterface:
     
     def ask(self, question: str) -> str:
         """Ask question and get voice response with typed fallback"""
-        print(f"\n🤖 JARVIS: {question}")
+        print(f"\n🤖 ARNOLD: {question}")
         input("   Press ENTER when ready... ")
         
         p = pyaudio.PyAudio()
@@ -475,13 +475,13 @@ class ContinuousLearner:
                 print(f"      View {view_count} captured...")
 
 # ============================================================================
-# MAIN JARVIS SYSTEM
+# MAIN ARNOLD SYSTEM
 # ============================================================================
 
-class WorkshopJARVIS:
+class WorkshopArnold:
     def __init__(self):
         print("="*70)
-        print("WORKSHOP JARVIS - Continuous Learning")
+        print("WORKSHOP ARNOLD - Continuous Learning")
         print("="*70)
         print("\nInitializing...")
         
@@ -631,5 +631,5 @@ class WorkshopJARVIS:
 # ============================================================================
 
 if __name__ == "__main__":
-    jarvis = WorkshopJARVIS()
-    jarvis.run()
+    arnold = WorkshopArnold()
+    arnold.run()

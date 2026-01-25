@@ -201,7 +201,7 @@ class VGGSoundDataset(Dataset):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         # V-JEPA expects video (multiple frames), so we stack the same frame
-        # This matches the pattern in jarvis_integrated_v2.py
+        # This matches the pattern in arnold_integrated_v2.py
         frames = np.stack([frame] * 16)  # 16 frames minimum
 
         # Use VJEPAEncoder's encode_frames method

@@ -1,4 +1,4 @@
-# jarvis_integrated.py - Florence-2 + V-JEPA Integrated System
+# arnold_integrated.py - Florence-2 + V-JEPA Integrated System
 """
 Two-layer architecture:
   Layer 1: Florence-2 - General world knowledge (what objects are in scene)
@@ -342,7 +342,7 @@ class VoiceInterface:
     
     def ask(self, question: str) -> str:
         """Ask a question and get voice response"""
-        print(f"\n🤖 JARVIS: {question}")
+        print(f"\n🤖 ARNOLD: {question}")
         input("   Press ENTER when ready to speak...")
         
         p = pyaudio.PyAudio()
@@ -469,12 +469,12 @@ class FocusSelector:
 # MAIN INTEGRATED SYSTEM
 # ============================================================================
 
-class WorkshopJARVIS:
+class WorkshopArnold:
     """Integrated Florence + V-JEPA Workshop Assistant"""
-    
+
     def __init__(self):
         print("=" * 70)
-        print("WORKSHOP JARVIS - Integrated Vision System")
+        print("WORKSHOP ARNOLD - Integrated Vision System")
         print("=" * 70)
         print("\nInitializing...")
         
@@ -687,5 +687,5 @@ class WorkshopJARVIS:
 # ============================================================================
 
 if __name__ == "__main__":
-    jarvis = WorkshopJARVIS()
-    jarvis.run()
+    arnold = WorkshopArnold()
+    arnold.run()

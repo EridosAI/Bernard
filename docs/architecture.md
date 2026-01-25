@@ -1,6 +1,6 @@
 # Architecture: Dual JEPA for Perception and Memory
 
-*How Protégé uses the same architecture to understand the world and navigate its own memories.*
+*How Arnold uses the same architecture to understand the world and navigate its own memories.*
 
 ---
 
@@ -12,7 +12,7 @@ When you perceive the world, you're not receiving raw data — you're running a 
 
 But consider memory. When you recall something, you're not playing back a recording. You're navigating a space of associations — one memory leads to another through learned connections. The *structure* of memory is itself something your brain has learned.
 
-The insight behind Protégé: **the same architecture that learns to predict the external world can learn to predict the structure of internal memory.**
+The insight behind Arnold: **the same architecture that learns to predict the external world can learn to predict the structure of internal memory.**
 
 ---
 

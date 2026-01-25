@@ -11,7 +11,7 @@ from torch.utils.data import Dataset, DataLoader
 from datetime import datetime
 
 print("="*70)
-print("WORKSHOP JARVIS - LoRA Training")
+print("WORKSHOP ARNOLD - LoRA Training")
 print("="*70)
 
 # Configuration
@@ -203,7 +203,7 @@ print("✓ Model saved!")
 print("\n" + "="*70)
 print("SUCCESS!")
 print("="*70)
-print(f"\nYour workshop JARVIS has learned from {len(dataset)} examples!")
+print(f"\nYour workshop Arnold has learned from {len(dataset)} examples!")
 print(f"\nTrained LoRA adapters saved to:")
 print(f"  {output_dir}")
 print("\nNext step: Create inference script to use the trained model")

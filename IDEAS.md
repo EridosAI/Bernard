@@ -281,27 +281,36 @@ This is long-horizon. But the architectural decisions made now (embedding spaces
 
 ---
 
-### 2026-01-25 — Project Name: Nascor
+### 2026-01-25 — Project Naming: Nascor + Arnold
 
-**Chosen name:** Nascor (Latin: "I am born" / "I arise")
+**Brand/Company:** Nascor (Latin: "I am born" / "I arise")
 
-**Pronunciation:** NASS-kor (2 syllables)
+- Pronunciation: NASS-kor (2 syllables)
+- The venture, public identity, philosophy
+- Used for: website, domain, social handles, public presence
+- Targets: nascor.ai, @nascor, github.com/nascor
 
-**Shorthand:** "Nas"
+**System Name:** Arnold
 
-**Semantic fit:**
-- Present tense, first person — the system speaking its own becoming
-- Consciousness emerges through interaction and experience
-- "I arise" captures the developmental philosophy: raised rather than trained
-- Latin/European lineage (preferred over Eastern philosophy terms)
+- **A**ssociative **R**ecognition **N**etwork for **O**bservation-**L**inked **D**evelopment
+- The AI entity being built
+- Used for: codebase, class names, module names, the system itself
+
+**Relationship:** Nascor is the venture; Arnold is what Nascor builds.
 
 **Namespace verification (2026-01-25):**
+
+Nascor:
 - ✅ No AI assistant/product conflicts
-- ✅ nascor.ai — likely available (needs registrar confirmation)
+- ✅ nascor.ai — likely available
 - ✅ @nascor — no Twitter/X presence found
 - ✅ github.com/nascor — no exact match
 
-**Known entities (non-conflicting):**
+Arnold:
+- ⚠️ Common name, but "ARNOLD" as acronym is distinctive
+- Used internally in code, not as public brand
+
+**Known Nascor entities (non-conflicting):**
 - Nascor Technologies (India) — Microsoft Outlook plugins
 - Nascor Formación (Spain) — Job training company
 - Nascor Consultores (Spain) — Business consulting
@@ -309,23 +318,26 @@ This is long-horizon. But the architectural decisions made now (embedding spaces
 
 None are AI assistants or in the same domain.
 
+**Naming lineage:**
+- Arnold → Arnold → Arnold (system)
+- Nascor (brand) established alongside Arnold
+
 **Alternatives considered and rejected:**
-- Protégé — original placeholder, felt temporary
-- Apperception — best semantic fit but 5 syllables, shortens to "App" (collision)
+- Arnold — original placeholder, felt temporary
+- Apperception — best semantic fit but 5 syllables, shortens to "App"
 - Bicameral — clean namespace, 4 syllables, but less personal
-- Satori, Kensho, Bodhi, Gnosis — Eastern terms, all heavily claimed by AI companies
-- Atlas, Talos, Enki, Jeeves, Jarvis — mythology/assistant names, all saturated
+- Satori, Kensho, Bodhi, Gnosis — Eastern terms, all heavily claimed
+- Atlas, Talos, Enki, Jeeves, Arnold — mythology/assistant names, all saturated
 - ALAN, AUGIE, ARCHIE, ALFIE, ERNIE, CADEN — friendly names, all claimed
 - Fio ("I become") — light presence but less distinctive
-
-Nascor selected as cleanest Latin option with perfect semantic resonance.
 
 **Action items:**
 - [ ] Register nascor.ai domain
 - [ ] Claim @nascor on X/Twitter
 - [ ] Create github.com/nascor organization
-- [ ] Update CLAUDE.md and project documentation
-- [ ] Rename codebase references from Protégé to Nascor
+- [ ] Update codebase: rename all Arnold/Arnold references to Arnold
+- [ ] Update CLAUDE.md with Nascor + Arnold naming
+- [ ] Update README for public presentation
 
 ---
 
@@ -346,7 +358,7 @@ The present moment is just where new information flows in; decay creates depth b
 Like gravity creating "up" and "down," decay creates the temporal dimension of experience
 
 Lifespan-tuned decay rates: A mayfly needs aggressive decay to keep memory proportional to remaining relevance-window. An elephant can afford slower decay because past patterns remain predictive longer. The decay rate is tuned to expected horizon of relevance.
-Implementation in Nascor:
+Implementation in Arnold:
 
 EMA drift in JEPA embeddings provides the passive decay mechanism
 "Always-on priming" from associative memory provides the rehearsal mechanism

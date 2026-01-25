@@ -1,4 +1,4 @@
-# active_jarvis_v4.py - Production-ready active learning
+# active_arnold_v4.py - Production-ready active learning
 import cv2
 import torch
 import torch.nn as nn
@@ -35,7 +35,7 @@ def save_knowledge():
 # Call save_knowledge() before exiting
 
 print("="*70)
-print("WORKSHOP JARVIS - Active Learning System")
+print("WORKSHOP ARNOLD - Active Learning System")
 print("="*70)
 
 # Load trained model
@@ -142,7 +142,7 @@ def find_match(vision_emb):
 
 def ask_question():
     """Ask what the object is"""
-    print(f"\n🤖 JARVIS: What is that object?")
+    print(f"\n🤖 ARNOLD: What is that object?")
     input("   Press ENTER when ready to answer... ")
     
     # Record
