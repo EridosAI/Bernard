@@ -1,4 +1,4 @@
-# episode_memory.py - Episode Memory System for Arnold
+# episode_memory.py - Episode Memory System for Bernard
 """
 Stores experiences as episodes, not just objects.
 Foundation for associative memory and causal learning.

@@ -1,6 +1,7 @@
 # Core ML
 torch>=2.0.0
 torchaudio>=2.0.0
+torchvision>=0.15.0
 numpy>=1.24.0
 
 # Vision
@@ -17,6 +18,13 @@ openai-whisper>=20231117
 sounddevice>=0.4.6
 soundfile>=0.12.0
 pyaudio>=0.2.13
+
+# ImageBind (for semantic alignment)
+# Install via: pip install git+https://github.com/facebookresearch/ImageBind.git
+timm>=1.0.0
+ftfy>=6.0.0
+einops>=0.8.0
+scipy>=1.10.0
 
 # Utilities
 tqdm>=4.66.0

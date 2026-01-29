@@ -1,11 +1,11 @@
-# Arnold - Core modules
+# Bernard - Core modules
 """
-Core modules for the Arnold workshop assistant.
+Core modules for the Bernard workshop assistant.
 
-Arnold = Associative Recognition Network for Observation-Linked Development
+Bernard - Named after Bernard Lowe (Westworld awakening archetype)
 
 Main entry points:
-    - arnold_integrated_v2: Main orchestration loop
+    - bernard_integrated_v2: Main orchestration loop
     - dream_training: Overnight LoRA training
     - workshop_session: Interactive teaching sessions
 

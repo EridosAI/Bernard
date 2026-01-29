@@ -18,6 +18,7 @@ from typing import Union, Optional
 import numpy as np
 import torch
 import torchaudio
+import soundfile as sf
 
 
 class BEATsEncoder:
@@ -148,15 +149,19 @@ class BEATsEncoder:
         Returns:
             embedding: [768] tensor
         """
-        # Load audio
-        waveform, sample_rate = torchaudio.load(audio_path)
+        # Load audio using soundfile directly (avoids torchaudio version issues)
+        audio_data, sample_rate = sf.read(audio_path)
 
-        # Convert stereo to mono if needed
-        if waveform.shape[0] > 1:
-            waveform = waveform.mean(dim=0, keepdim=True)
+        # Convert to torch tensor
+        waveform = torch.from_numpy(audio_data).float()
 
-        # Remove channel dimension for encode()
-        waveform = waveform.squeeze(0)
+        # Handle stereo: convert to shape [channels, samples]
+        if waveform.dim() == 2:
+            # Multi-channel: [samples, channels] -> [channels, samples]
+            waveform = waveform.T
+            # Convert stereo to mono
+            waveform = waveform.mean(dim=0)
+        # Now waveform is [samples]
 
         return self.encode(waveform, sample_rate)
 

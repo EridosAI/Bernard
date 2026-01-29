@@ -98,7 +98,7 @@ def main():
             print(f"      - Ensure visual embeddings are being captured")
         if with_objects == 0:
             print(f"      - Ensure object detection is working")
-        print("   Run active_arnold to collect more episodes!")
+        print("   Run active_bernard to collect more episodes!")
     else:
         print("   ✓ You're good to go!")
         print("   Next step: Run dream_training.py to train the model")

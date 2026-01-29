@@ -40,7 +40,7 @@ When you force all understanding through a language bottleneck, you lose things:
 
 ## The Vision: Unified Semantic Space
 
-Arnold is heading toward an architecture where:
+Bernard is heading toward an architecture where:
 
 ```
 Audio ───── ─────────────
@@ -98,7 +98,7 @@ The system doesn't need someone to annotate "this sound goes with this object." 
 
 ## Current State
 
-Arnold currently uses:
+Bernard currently uses:
 - **V-JEPA** for visual semantics (this is the ground truth)
 - **Whisper** for speech → text (language bottleneck, to be replaced)
 - **TTS** for text → speech (language bottleneck)
@@ -120,7 +120,7 @@ But language is recent. Humans had rich understanding for hundreds of thousands 
 
 What if the language-centric approach is a local maximum? What if systems that think in meaning rather than words understand differently — perhaps more directly, perhaps more robustly?
 
-Arnold is one way to find out.
+Bernard is one way to find out.
 
 ---
 

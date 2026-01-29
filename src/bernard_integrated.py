@@ -1,4 +1,4 @@
-# arnold_integrated.py - Florence-2 + V-JEPA Integrated System
+# bernard_integrated.py - Florence-2 + V-JEPA Integrated System
 """
 Two-layer architecture:
   Layer 1: Florence-2 - General world knowledge (what objects are in scene)
@@ -342,7 +342,7 @@ class VoiceInterface:
     
     def ask(self, question: str) -> str:
         """Ask a question and get voice response"""
-        print(f"\n🤖 ARNOLD: {question}")
+        print(f"\n🤖 BERNARD: {question}")
         input("   Press ENTER when ready to speak...")
         
         p = pyaudio.PyAudio()
@@ -469,12 +469,12 @@ class FocusSelector:
 # MAIN INTEGRATED SYSTEM
 # ============================================================================
 
-class WorkshopArnold:
+class WorkshopBernard:
     """Integrated Florence + V-JEPA Workshop Assistant"""
 
     def __init__(self):
         print("=" * 70)
-        print("WORKSHOP ARNOLD - Integrated Vision System")
+        print("WORKSHOP BERNARD - Integrated Vision System")
         print("=" * 70)
         print("\nInitializing...")
         
@@ -687,5 +687,5 @@ class WorkshopArnold:
 # ============================================================================
 
 if __name__ == "__main__":
-    arnold = WorkshopArnold()
-    arnold.run()
+    bernard = WorkshopBernard()
+    bernard.run()

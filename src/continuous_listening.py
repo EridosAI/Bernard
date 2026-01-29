@@ -1,4 +1,4 @@
-# continuous_listening.py - Always-on voice pipeline for Arnold
+# continuous_listening.py - Always-on voice pipeline for Bernard
 """
 VAD -> Whisper -> Intent classification pipeline.
 Runs in background thread, queues events for main thread.
@@ -14,8 +14,9 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
-# Audio
-import sounddevice as sd
+# Audio (lazy import — sounddevice loaded in _audio_loop so
+# classify_intent / unit tests work without audio hardware)
+# import sounddevice as sd  -> see _audio_loop
 
 
 class Intent(Enum):
@@ -301,6 +302,8 @@ class ContinuousListener:
 
     def _audio_loop(self):
         """Main audio capture and processing loop"""
+        import sounddevice as sd
+
         # Audio buffer for current utterance
         audio_buffer = []
         is_speaking = False

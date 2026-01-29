@@ -12,7 +12,7 @@ import time
 from datetime import datetime
 
 print("="*70)
-print("WORKSHOP ARNOLD - Continuous Learning Session")
+print("WORKSHOP BERNARD - Continuous Learning Session")
 print("="*70)
 
 # Configuration

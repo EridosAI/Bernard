@@ -1,4 +1,4 @@
-# active_arnold_v3.py - Better contextual questions
+# active_bernard_v3.py - Better contextual questions
 import cv2
 import torch
 import torch.nn as nn
@@ -13,7 +13,7 @@ import numpy as np
 import time
 
 print("="*70)
-print("ACTIVE ARNOLD - v3 (Contextual Questions)")
+print("ACTIVE BERNARD - v3 (Contextual Questions)")
 print("="*70)
 
 # Load trained model
@@ -180,7 +180,7 @@ def ask_question(properties):
     else:
         question = "What new object did you just show me?"
     
-    print(f"\n🤖 ARNOLD: {question}")
+    print(f"\n🤖 BERNARD: {question}")
     
     # Wait for user to be ready
     input("   Press ENTER when ready to answer... ")
@@ -290,7 +290,7 @@ while True:
         time.sleep(10)
     
     except KeyboardInterrupt:
-        print("\n\nStopping Arnold...")
+        print("\n\nStopping Bernard...")
         print(f"\nLearned {len(known_objects)} objects:")
         for obj in known_objects.keys():
             print(f"  - {obj}")

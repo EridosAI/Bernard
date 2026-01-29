@@ -281,63 +281,35 @@ This is long-horizon. But the architectural decisions made now (embedding spaces
 
 ---
 
-### 2026-01-25 — Project Naming: Nascor + Arnold
+### 2026-01-29 — Project Naming: Eridos + Bernard
 
-**Brand/Company:** Nascor (Latin: "I am born" / "I arise")
+**Brand/Company:** Eridos (Greek-ified Eridu, the first city — where civilization began)
 
-- Pronunciation: NASS-kor (2 syllables)
+- Pronunciation: eh-REE-dohs (3 syllables)
 - The venture, public identity, philosophy
 - Used for: website, domain, social handles, public presence
-- Targets: nascor.ai, @nascor, github.com/nascor
+- Logo: 𒉣𒆠 (cuneiform NUN.KI = Eridu)
+- Targets: eridos.ai, @eridos, github.com/eridos
 
-**System Name:** Arnold
+**System Name:** Bernard
 
-- **A**ssociative **R**ecognition **N**etwork for **O**bservation-**L**inked **D**evelopment
+- Named after Bernard Lowe (Westworld awakening archetype)
 - The AI entity being built
 - Used for: codebase, class names, module names, the system itself
 
-**Relationship:** Nascor is the venture; Arnold is what Nascor builds.
-
-**Namespace verification (2026-01-25):**
-
-Nascor:
-- ✅ No AI assistant/product conflicts
-- ✅ nascor.ai — likely available
-- ✅ @nascor — no Twitter/X presence found
-- ✅ github.com/nascor — no exact match
-
-Arnold:
-- ⚠️ Common name, but "ARNOLD" as acronym is distinctive
-- Used internally in code, not as public brand
-
-**Known Nascor entities (non-conflicting):**
-- Nascor Technologies (India) — Microsoft Outlook plugins
-- Nascor Formación (Spain) — Job training company
-- Nascor Consultores (Spain) — Business consulting
-- Nascor Energias (Spain) — Petroleum
-
-None are AI assistants or in the same domain.
+**Relationship:** Eridos is the venture; Bernard is what Eridos builds.
 
 **Naming lineage:**
-- Arnold → Arnold → Arnold (system)
-- Nascor (brand) established alongside Arnold
-
-**Alternatives considered and rejected:**
-- Arnold — original placeholder, felt temporary
-- Apperception — best semantic fit but 5 syllables, shortens to "App"
-- Bicameral — clean namespace, 4 syllables, but less personal
-- Satori, Kensho, Bodhi, Gnosis — Eastern terms, all heavily claimed
-- Atlas, Talos, Enki, Jeeves, Arnold — mythology/assistant names, all saturated
-- ALAN, AUGIE, ARCHIE, ALFIE, ERNIE, CADEN — friendly names, all claimed
-- Fio ("I become") — light presence but less distinctive
+- Protégé → Jarvis → Arnold → Bernard (system)
+- Nascor → Eridos (brand)
 
 **Action items:**
-- [ ] Register nascor.ai domain
-- [ ] Claim @nascor on X/Twitter
-- [ ] Create github.com/nascor organization
-- [ ] Update codebase: rename all Arnold/Arnold references to Arnold
-- [ ] Update CLAUDE.md with Nascor + Arnold naming
-- [ ] Update README for public presentation
+- [ ] Register eridos.ai domain
+- [ ] Claim @eridos on X/Twitter
+- [ ] Create github.com/eridos organization
+- [ ] Update codebase: rename all Arnold references to Bernard ✅
+- [ ] Update CLAUDE.md with Eridos + Bernard naming ✅
+- [ ] Update README for public presentation ✅
 
 ---
 
@@ -358,7 +330,7 @@ The present moment is just where new information flows in; decay creates depth b
 Like gravity creating "up" and "down," decay creates the temporal dimension of experience
 
 Lifespan-tuned decay rates: A mayfly needs aggressive decay to keep memory proportional to remaining relevance-window. An elephant can afford slower decay because past patterns remain predictive longer. The decay rate is tuned to expected horizon of relevance.
-Implementation in Arnold:
+Implementation in Bernard:
 
 EMA drift in JEPA embeddings provides the passive decay mechanism
 "Always-on priming" from associative memory provides the rehearsal mechanism
@@ -417,7 +389,128 @@ What's the right granularity of guidance? (Broad values vs specific behaviors)
 
 ---
 
+### 2026-01-26 — Formative Experience and Foundational Topology
 
+**Core concept:** Formal training data is "flat" — uniform intensity, no temporal depth, no rehearsal history. A fact about paperclips and a fact about death arrive at the same volume. Lived experience has contour: surprises encode more strongly, things that mattered get rehearsed, temporal order creates narrative. The intensity variation *is* personality formation.
+
+**The childhood parallel:** Human early years don't just add memories — they establish the *topology* of semantic space. Attachment patterns, basic trust, cause-and-effect intuitions. Everything later builds on that terrain. If Bernard's early semantic space is shaped by flat data or nothing in particular, later experiences build on undefined ground.
+
+**The concern:** Heavy pre-training on formal data might produce competence without *character*. The system would know things without any of them mattering more than others. Knowledgeable emptiness — like someone who read encyclopedias but never lived.
+
+**Options considered:**
+
+1. **Synthetic pre-childhood** (generated videos simulating positive experiences)
+   - Problem: Gives Bernard false memories of things that didn't happen
+   - Breaks coherence between perception and reality before it even starts
+   - Philosophically inconsistent with "learning through lived experience"
+
+2. **Trust the architecture** (decay, rehearsal, dreams handle everything)
+   - Relies on the mechanisms being sufficient without intentional curation
+   - Risk: early period might be too noisy or unstructured
+
+3. **The architecture *is* the childhood** (preferred direction)
+   - The early period with the human is the formative experience
+   - Not simulated — real joint attention on real objects
+   - The human's role in early weeks is literally parenting
+
+**What "positive formative experience" might mean:**
+- Consistency: same environment, predictable human, stable objects
+- Success experiences: early learning that works, builds confidence
+- Recovery modeling: errors aren't catastrophic, things get repaired
+- Patient repetition: natural rehearsal through real work
+- Genuine interaction: not scripted, real shared attention
+
+**Architectural grounding (incomplete):**
+
+This idea feels right but isn't yet connected to concrete mechanisms. Open questions:
+- Does the order of early object associations actually shape later topology?
+- Is there a critical period where associative structure is more plastic?
+- How would we even measure whether foundational topology is "healthy"?
+- Does the inward JEPA have something analogous to developmental windows?
+
+The intuition: minimal formal pre-training (just enough to communicate), then let real structure emerge from intentional early experience. But this needs more thought on *how* early associations become foundational vs. just first-in-line.
+
+**Status:** Conceptually important, architecturally ungrounded. Park for now, revisit when associative memory system is further along.
+
+---
+
+2026-01-28 — Reading as Visual Skill (Text Without OCR)
+Core concept: Text is just another visual pattern. The same visual encoder that recognizes a hammer should recognize the word "hammer" — and both should land in the same semantic region. No OCR pipeline. No text tokenization. Visual text patterns map directly to meaning.
+How humans read:
+[early reader]   see "hammer" → h-a-m-m-e-r → /hæmər/ → meaning
+[fluent reader]  see "hammer" → meaning (direct)
+Fluent readers don't decode letter-by-letter. The visual pattern of the word becomes fused with its meaning through experience. Bernard should learn the same way.
+The unified vision:
+                        SEMANTIC SPACE
+                              
+        [see hammer]  ───────►  ◉ hammer region
+        [hear "hammer"] ─────►  ◉ 
+        [hear hammer sound] ──► ◉
+        [see "hammer" written]► ◉  ← THIS IS READING
+Training approach — synthetic distillation:
+python# Generate training data
+words = ["hammer", "drill", "wire", "capacitor", ...]
+
+for word in words:
+    # Create images of the word (vary font, size, rotation, background)
+    text_images = render_word_variations(word, n=100)
+    
+    # Get semantic target from ImageBind
+    target_embedding = imagebind.encode_text(word)  # 1024-dim
+    
+    # Training pairs
+    for img in text_images:
+        visual_embedding = vjepa.encode(img)
+        projected = visual_projection(visual_embedding)
+        loss = mse(projected, target_embedding)
+Variations to include:
+
+Different fonts (serif, sans-serif, handwritten, stencil)
+Different sizes and aspect ratios
+Different rotations/perspectives
+Different backgrounds (paper, labels, screens, tool surfaces)
+Noise, blur, partial occlusion
+ALL CAPS, lowercase, Mixed Case
+
+Training data scale:
+
+10,000 words × 50 variations = 500,000 training images
+Words from: common vocabulary + workshop terms + user's specific labels
+Synthetic generation is cheap — render on-the-fly or pre-generate
+
+Phase 2 — Real-world text:
+Once synthetic training works, fine-tune on:
+
+Photos of labels in the workshop
+Text on tool packaging and equipment
+Handwritten notes
+Screenshots and displays
+
+What existing models do (and don't do):
+ModelWhat it doesWhy it's not enoughCLIP/SigLIPImages with text influence embeddingsWeak, not trained specifically for readingTrOCRImage → textOutputs tokens, not semantic embeddingsPaddleOCRImage → textSame — text bottleneckFlorence-2Can do OCROutputs text, not embeddings
+None produce: visual text pattern → semantic embedding directly.
+Relationship to Florence removal:
+This is part of treating Florence-2 as scaffolding. Currently:
+
+Florence detects objects and provides labels
+If text appears, would need separate OCR
+
+Post-scaffolding:
+
+V-JEPA recognizes objects directly (no labels needed)
+V-JEPA recognizes text directly (no OCR needed)
+Both map to unified semantic space
+
+The deeper principle:
+Text isn't special. It's a visual convention humans invented ~5000 years ago. A truly unified perceptual system learns to interpret text visually, the same way it interprets faces, tools, or any other meaningful pattern.
+The label on your oscilloscope shouldn't need OCR. Bernard should learn that visual pattern means "oscilloscope" the same way it learns the device's shape means oscilloscope.
+Implementation priority: Medium-low. Current scaffolding works. But this is the clean path when removing the text bottleneck entirely.
+Roadmap position:
+
+Current: OCR if needed (scaffolding)
+Near-term: Synthetic text → semantic distillation
+Future: Real-world text fine-tuning
+End state: Written text is just another visual feature
 
 ## Shelved Ideas
 

@@ -1,4 +1,4 @@
-# arnold_modular.py - Continuous Learning Architecture
+# bernard_modular.py - Continuous Learning Architecture
 import cv2
 import torch
 import torch.nn as nn
@@ -350,7 +350,7 @@ class VoiceInterface:
     
     def ask(self, question: str) -> str:
         """Ask question and get voice response with typed fallback"""
-        print(f"\n🤖 ARNOLD: {question}")
+        print(f"\n🤖 BERNARD: {question}")
         input("   Press ENTER when ready... ")
         
         p = pyaudio.PyAudio()
@@ -475,13 +475,13 @@ class ContinuousLearner:
                 print(f"      View {view_count} captured...")
 
 # ============================================================================
-# MAIN ARNOLD SYSTEM
+# MAIN BERNARD SYSTEM
 # ============================================================================
 
-class WorkshopArnold:
+class WorkshopBernard:
     def __init__(self):
         print("="*70)
-        print("WORKSHOP ARNOLD - Continuous Learning")
+        print("WORKSHOP BERNARD - Continuous Learning")
         print("="*70)
         print("\nInitializing...")
         
@@ -631,5 +631,5 @@ class WorkshopArnold:
 # ============================================================================
 
 if __name__ == "__main__":
-    arnold = WorkshopArnold()
-    arnold.run()
+    bernard = WorkshopBernard()
+    bernard.run()

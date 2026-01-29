@@ -140,8 +140,11 @@ class AudioVisualInfoNCE(nn.Module):
 class AudioVisualTrainingConfig:
     """Configuration for audio-visual training"""
 
-    # Data
+    # Data - supports single dir (str) or multiple dirs (list)
     data_dir: str = "./data/vggsound"
+    vggsound_dir: str = "./data/vggsound"
+    howto100m_dir: str = "./data/howto100m"
+    use_combined: bool = False  # If True, use both datasets
 
     # Model paths
     vjepa_path: str = "./models/base/vjepa2"
@@ -154,10 +157,13 @@ class AudioVisualTrainingConfig:
 
     # Training
     batch_size: int = 32
-    num_epochs: int = 50
+    num_epochs: int = 100  # Higher limit, early stopping will trigger
     learning_rate: float = 1e-4
     weight_decay: float = 0.01
     temperature: float = 0.07
+
+    # Early stopping
+    early_stopping_patience: int = 10  # Stop after N epochs without improvement
 
     # Evaluation
     eval_every: int = 5  # epochs
@@ -262,7 +268,7 @@ class AudioVisualTrainer:
         sys.path.insert(0, str(Path(__file__).parent))
 
         try:
-            from arnold_integrated_v2 import VJEPAEncoder
+            from bernard_integrated_v2 import VJEPAEncoder
             self.vjepa_encoder = VJEPAEncoder(
                 self.config.vjepa_path,
                 self.config.vjepa_adapter_path,
@@ -274,7 +280,7 @@ class AudioVisualTrainer:
             self.vjepa_encoder = self._create_minimal_vjepa_encoder()
 
     def _create_minimal_vjepa_encoder(self):
-        """Create minimal V-JEPA encoder without full arnold integration"""
+        """Create minimal V-JEPA encoder without full bernard integration"""
         from transformers import AutoModel, AutoVideoProcessor
         from peft import PeftModel
 
@@ -307,23 +313,63 @@ class AudioVisualTrainer:
 
     def _load_datasets(self):
         """Load train and test datasets with precomputed embeddings"""
-        from audio_visual_dataset import VGGSoundDataset
+        from audio_visual_dataset import VGGSoundDataset, HowTo100MDataset, CombinedAVDataset
 
-        self.train_dataset = VGGSoundDataset(
-            data_dir=self.config.data_dir,
-            beats_encoder=self.beats_encoder,
-            vjepa_encoder=self.vjepa_encoder,
-            precompute_embeddings=True,
-            split="train"
-        )
+        if self.config.use_combined:
+            # Load both datasets and combine them
+            print("\nLoading VGGSound dataset...")
+            vggsound_train = VGGSoundDataset(
+                data_dir=self.config.vggsound_dir,
+                beats_encoder=self.beats_encoder,
+                vjepa_encoder=self.vjepa_encoder,
+                precompute_embeddings=True,
+                split="train"
+            )
+            vggsound_test = VGGSoundDataset(
+                data_dir=self.config.vggsound_dir,
+                beats_encoder=self.beats_encoder,
+                vjepa_encoder=self.vjepa_encoder,
+                precompute_embeddings=True,
+                split="test"
+            )
 
-        self.test_dataset = VGGSoundDataset(
-            data_dir=self.config.data_dir,
-            beats_encoder=self.beats_encoder,
-            vjepa_encoder=self.vjepa_encoder,
-            precompute_embeddings=True,
-            split="test"
-        )
+            print("\nLoading HowTo100M dataset...")
+            howto100m_train = HowTo100MDataset(
+                data_dir=self.config.howto100m_dir,
+                beats_encoder=self.beats_encoder,
+                vjepa_encoder=self.vjepa_encoder,
+                precompute_embeddings=True,
+                split="train"
+            )
+            howto100m_test = HowTo100MDataset(
+                data_dir=self.config.howto100m_dir,
+                beats_encoder=self.beats_encoder,
+                vjepa_encoder=self.vjepa_encoder,
+                precompute_embeddings=True,
+                split="test"
+            )
+
+            # Combine datasets
+            print("\nCombining datasets...")
+            self.train_dataset = CombinedAVDataset([vggsound_train, howto100m_train])
+            self.test_dataset = CombinedAVDataset([vggsound_test, howto100m_test])
+        else:
+            # Single dataset mode (original behavior)
+            self.train_dataset = VGGSoundDataset(
+                data_dir=self.config.data_dir,
+                beats_encoder=self.beats_encoder,
+                vjepa_encoder=self.vjepa_encoder,
+                precompute_embeddings=True,
+                split="train"
+            )
+
+            self.test_dataset = VGGSoundDataset(
+                data_dir=self.config.data_dir,
+                beats_encoder=self.beats_encoder,
+                vjepa_encoder=self.vjepa_encoder,
+                precompute_embeddings=True,
+                split="test"
+            )
 
         self.train_loader = DataLoader(
             self.train_dataset,
@@ -435,14 +481,17 @@ class AudioVisualTrainer:
         }
 
     def train(self):
-        """Full training loop"""
+        """Full training loop with early stopping"""
         self.setup()
 
         print("\n" + "=" * 70)
         print("Starting Training")
         print("=" * 70)
+        print(f"Early stopping patience: {self.config.early_stopping_patience} epochs")
 
         best_accuracy = 0.0
+        patience_counter = 0
+        early_stopped = False
 
         for epoch in range(1, self.config.num_epochs + 1):
             # Train one epoch
@@ -465,12 +514,25 @@ class AudioVisualTrainer:
                       f"Top5={metrics['top5_accuracy']:.3f}, "
                       f"MeanRank={metrics['mean_rank']:.1f}")
 
-                # Save best model
+                # Check for improvement
                 if metrics['top1_accuracy'] > best_accuracy:
                     best_accuracy = metrics['top1_accuracy']
                     self.history['best_epoch'] = epoch
                     self.history['best_top1_accuracy'] = best_accuracy
                     self._save_checkpoint('best')
+                    patience_counter = 0
+                    print(f"  -> New best! Saved checkpoint.")
+                else:
+                    patience_counter += 1
+                    print(f"  -> No improvement ({patience_counter}/{self.config.early_stopping_patience})")
+
+                    # Early stopping check
+                    if patience_counter >= self.config.early_stopping_patience:
+                        print(f"\nEarly stopping triggered at epoch {epoch}")
+                        early_stopped = True
+                        self.history['early_stopped'] = True
+                        self.history['final_epoch'] = epoch
+                        break
             else:
                 print(f"Epoch {epoch:3d}: Loss={train_loss:.4f}")
 
@@ -486,9 +548,13 @@ class AudioVisualTrainer:
 
         print("\n" + "=" * 70)
         print(f"Training complete!")
+        if early_stopped:
+            print(f"Early stopped at epoch {self.history['final_epoch']}")
         print(f"Best Top-1 Accuracy: {best_accuracy:.3f} (epoch {self.history['best_epoch']})")
         print(f"Model saved to: {self.config.output_dir}")
         print("=" * 70)
+
+        return self.history
 
     def _save_checkpoint(self, name: str):
         """Save projection head weights"""

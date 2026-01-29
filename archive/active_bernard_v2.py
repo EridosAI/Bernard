@@ -1,4 +1,4 @@
-# active_arnold_v2.py - With trained alignment head
+# active_bernard_v2.py - With trained alignment head
 import cv2
 import torch
 import torch.nn as nn
@@ -13,7 +13,7 @@ import numpy as np
 import time
 
 print("="*70)
-print("ACTIVE ARNOLD - v2 (with trained model)")
+print("ACTIVE BERNARD - v2 (with trained model)")
 print("="*70)
 
 # Load trained model
@@ -110,7 +110,7 @@ def find_match(vision_emb):
 
 def ask_question(question):
     """Ask via text, get voice answer"""
-    print(f"\n🤖 ARNOLD: {question}")
+    print(f"\n🤖 BERNARD: {question}")
     
     # Record answer
     p = pyaudio.PyAudio()
@@ -181,5 +181,5 @@ try:
         time.sleep(10)
 
 except KeyboardInterrupt:
-    print("\n\nStopping Arnold...")
+    print("\n\nStopping Bernard...")
     print(f"Learned {len(known_objects)} objects: {list(known_objects.keys())}")

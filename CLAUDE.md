@@ -1,19 +1,19 @@
-# Arnold - AI Workshop Assistant
+# Bernard - AI Workshop Assistant
 
-**Arnold = Associative Recognition Network for Observation-Linked Development**
+**Bernard - Named after Bernard Lowe (Westworld awakening archetype)**
 
 > An embodied AI that learns to recognize objects and understand spatial relationships through natural voice interaction, using a dual JEPA architecture for world modeling and associative memory.
 
-*Note: "Nascor" is the company/brand name for the website, handles, and public presence. "Arnold" is the internal system name used in code.*
+*Note: "Eridos" is the company/brand name for the website, handles, and public presence. "Bernard" is the internal system name used in code.*
 
 ## Quick Reference
 
 ```bash
 # Activate environment
-conda activate arnold
+conda activate bernard
 
 # Run main system
-python arnold_integrated_v2.py
+python bernard_integrated_v2.py
 
 # Run dream training (overnight)
 python dream_training.py
@@ -45,7 +45,7 @@ Florence gives us the "what category" — V-JEPA learns "which specific one."
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `arnold_integrated_v2.py` | Main orchestration, capture loop, voice interface | ✅ Working |
+| `bernard_integrated_v2.py` | Main orchestration, capture loop, voice interface | ✅ Working |
 | `episode_memory.py` | Stores episodes with objects, spatial info, timestamps | ✅ Working |
 | `inward_jepa.py` | Associative memory predictor network | ✅ Implemented, needs data |
 | `dream_training.py` | Overnight LoRA fine-tuning | ✅ Phase 3 integrated |
@@ -95,7 +95,7 @@ The exponential moving average mechanism in JEPA serves as a natural forgetting 
 1. Create standalone file with clear dataclass definitions
 2. Use `@dataclass` for all data structures
 3. Include `to_dict()` / `from_dict()` for JSON serialization
-4. Add integration points in `arnold_integrated_v2.py`
+4. Add integration points in `bernard_integrated_v2.py`
 
 ### Testing Approach
 

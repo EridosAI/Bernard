@@ -1,28 +1,28 @@
-# Arnold
+# Bernard
 
-**Associative Recognition Network for Observation-Linked Development**
+**Named after Bernard Lowe (Westworld awakening archetype)**
 
 An AI workshop assistant that learns by living with me.
 
 No massive datasets. No fine-tuning on millions of images. Just a camera watching my workbench, a microphone listening to my explanations, and time.
 
-*Note: "Nascor" is the company/brand name for the website and public presence. "Arnold" is the internal system name used in code.*
+*Note: "Eridos" is the company/brand name for the website and public presence. "Bernard" is the internal system name used in code.*
 
 ## What is this?
 
-Arnold is an experiment in **raising** an AI rather than training it.
+Bernard is an experiment in **raising** an AI rather than training it.
 
 The system watches my electronics workshop through an overhead camera. When it sees something unfamiliar, it asks. When I explain, it remembers. Over weeks and months, it builds understanding — not from curated data, but from lived experience.
 
 ## The Core Ideas
 
-**Learning through interaction, not ingestion.** Most AI learns by consuming vast datasets in isolation. Arnold learns the way a new apprentice would — by watching, asking questions, and being corrected.
+**Learning through interaction, not ingestion.** Most AI learns by consuming vast datasets in isolation. Bernard learns the way a new apprentice would — by watching, asking questions, and being corrected.
 
 **Memory works like perception.** The same architecture (JEPA) that predicts the external world can predict memory associations. Objects that appear together create bridges between experiences. Time becomes a learned dimension, not a special axis.
 
-**Objects as meaning.** When I teach Arnold that this is a "multimeter," it doesn't just label pixels. It learns that multimeters appear alongside circuit boards, that I reach for them when debugging, that they make certain beeping sounds. Meaning emerges from context.
+**Objects as meaning.** When I teach Bernard that this is a "multimeter," it doesn't just label pixels. It learns that multimeters appear alongside circuit boards, that I reach for them when debugging, that they make certain beeping sounds. Meaning emerges from context.
 
-**Overnight dreaming.** During the day, Arnold watches and remembers. Overnight, it consolidates — training on the day's experiences, strengthening connections, building intuition. Separation of fast learning and slow integration.
+**Overnight dreaming.** During the day, Bernard watches and remembers. Overnight, it consolidates — training on the day's experiences, strengthening connections, building intuition. Separation of fast learning and slow integration.
 
 ## The Destination: Post-Linguistic Intelligence
 
@@ -32,7 +32,7 @@ Current voice assistants work like this: audio → transcribe to text → proces
 
 But that's not how understanding works. When you hear a door slam, you don't think the word "door" — you *know* door-slamming directly. The sound maps to meaning without language as intermediary. Words come later, if you need to tell someone about it.
 
-**Arnold is heading toward a fully semantic architecture:**
+**Bernard is heading toward a fully semantic architecture:**
 
 ```
          Current System                         The Vision
@@ -54,7 +54,7 @@ In the target architecture:
 - **All modalities meet in unified semantic space** — the same space where memories live
 - **Language is generated only when needed** — to communicate outward, not to think
 
-This means Arnold could eventually understand "pass me that" + a pointing gesture + the sound of the thing I tapped on the bench — all fused into meaning without any of it becoming words until it responds.
+This means Bernard could eventually understand "pass me that" + a pointing gesture + the sound of the thing I tapped on the bench — all fused into meaning without any of it becoming words until it responds.
 
 The grounding is visual. V-JEPA's learned representations become the semantic bedrock, and other modalities learn to map into that space. Words are just one more modality — useful for communication, but not privileged.
 
@@ -132,7 +132,7 @@ What if understanding comes from *living with* information rather than *ingestin
 
 And what if language, rather than being the medium of thought, is just one channel for expressing it?
 
-I don't know if these ideas are right. Arnold is how I'm finding out.
+I don't know if these ideas are right. Bernard is how I'm finding out.
 
 ## Built With
 
