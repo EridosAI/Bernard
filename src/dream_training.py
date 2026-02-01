@@ -33,7 +33,7 @@ from tqdm import tqdm
 class TrainingConfig:
     # Model paths
     base_model_path = "./models/base/vjepa2"
-    existing_adapter_path = "./models/adapters/workshop_lora_20260117_041817"
+    existing_adapter_path = "./models/adapters/workshop_lora_20260201_181753"
     output_dir = "./models/adapters"
     
     # Training data

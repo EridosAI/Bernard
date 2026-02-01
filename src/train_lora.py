@@ -31,7 +31,7 @@ session_dirs = glob.glob("./data/sessions/session_*")
 
 if not session_dirs:
     print("❌ No training sessions found!")
-    print("Run workshop_session.py first to collect training data.")
+    print("Run bernard_integrated_v2.py first to collect training data.")
     exit()
 
 print(f"✓ Found {len(session_dirs)} session(s)")
@@ -74,7 +74,7 @@ dataset = WorkshopDataset(session_dirs)
 
 if len(dataset) == 0:
     print("\n❌ No valid training examples found (all narrations were empty)")
-    print("Run workshop_session.py and speak during recording.")
+    print("Run bernard_integrated_v2.py and speak during sessions.")
     exit()
 
 dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)

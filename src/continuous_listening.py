@@ -35,6 +35,7 @@ class VoiceEvent:
     timestamp: float          # when speech ended
     audio_duration: float     # how long the utterance was
     extracted_name: Optional[str] = None  # parsed object name (for TEACH/CORRECT)
+    raw_audio: Optional[np.ndarray] = None  # raw audio float32 @ 16kHz
 
 
 # =============================================================================
@@ -248,10 +249,12 @@ class ContinuousListener:
         event_queue: queue.Queue,     # Events go here for main thread
         sample_rate: int = 16000,
         vad_threshold: float = 0.5,   # Silero confidence threshold
-        silence_duration: float = 0.8 # Seconds of silence to end utterance
+        silence_duration: float = 0.8,# Seconds of silence to end utterance
+        narration_queue: Optional[queue.Queue] = None  # All speech for training data
     ):
         self.whisper = whisper_model
         self.event_queue = event_queue
+        self.narration_queue = narration_queue
         self.sample_rate = sample_rate
         self.vad_threshold = vad_threshold
         self.silence_duration = silence_duration
@@ -462,6 +465,17 @@ class ContinuousListener:
             else:
                 print()
 
+            # Queue narration for training pipeline regardless of intent
+            if self.narration_queue is not None and len(transcript.split()) >= 3:
+                self.narration_queue.put(VoiceEvent(
+                    intent=intent,
+                    transcript=transcript,
+                    timestamp=speech_end_time,
+                    audio_duration=len(audio_buffer) / self.sample_rate,
+                    extracted_name=extracted_name,
+                    raw_audio=audio_buffer.copy()
+                ))
+
             if intent == Intent.IGNORE:
                 return
 
@@ -471,7 +485,8 @@ class ContinuousListener:
                 transcript=transcript,
                 timestamp=speech_end_time,
                 audio_duration=len(audio_buffer) / self.sample_rate,
-                extracted_name=extracted_name
+                extracted_name=extracted_name,
+                raw_audio=audio_buffer.copy()
             )
             self.event_queue.put(event)
 

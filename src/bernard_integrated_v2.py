@@ -860,6 +860,82 @@ class TrainingDataCollector:
         }
 
 # ============================================================================
+# SESSION CLIP SAVER - Auto-save training data from live sessions
+# ============================================================================
+
+class SessionClipSaver:
+    """Saves training clips to data/sessions/ in train_lora.py-compatible format.
+
+    Every live session automatically produces training data. No separate
+    collection mode needed — Bernard's lived experience IS his training data.
+    """
+
+    def __init__(self, text_encoder, base_dir: str = "./data/sessions"):
+        self.text_encoder = text_encoder
+        self.session_name = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        self.session_dir = os.path.join(base_dir, self.session_name)
+        os.makedirs(self.session_dir, exist_ok=True)
+        self._clip_count = 0
+        print(f"  Session clip saver: {self.session_dir}")
+
+    def save_clip(self,
+                  vision_embedding: Optional[np.ndarray],
+                  narration: Optional[str] = None,
+                  event_type: str = "observation",
+                  event_detail: str = "") -> Optional[str]:
+        """Save a training clip NPZ file.
+
+        Args:
+            vision_embedding: V-JEPA scene embedding (1024-dim)
+            narration: Optional transcript text
+            event_type: Episode event type (for metadata)
+            event_detail: Episode detail (for metadata)
+
+        Returns:
+            Path to saved NPZ, or None if no vision embedding.
+        """
+        if vision_embedding is None:
+            return None
+
+        self._clip_count += 1
+
+        # Flatten and reshape to (1, 1024) to match workshop_session.py format
+        vision = vision_embedding.flatten()
+        if vision.shape[0] != 1024:
+            print(f"  Warning: vision embedding dim {vision.shape[0]}, expected 1024")
+            return None
+        vision = vision.reshape(1, -1).astype(np.float32)
+
+        # Build narration and text embedding
+        if narration and narration.strip():
+            narration_text = narration.strip()
+            text_emb = self.text_encoder.encode(
+                narration_text, convert_to_numpy=True
+            ).astype(np.float32)
+        else:
+            narration_text = ""
+            text_emb = np.zeros(384, dtype=np.float32)
+
+        # Save NPZ with exact keys train_lora.py expects
+        clip_path = os.path.join(
+            self.session_dir,
+            f"clip_{self._clip_count}_embeddings.npz"
+        )
+        np.savez(
+            clip_path,
+            vision=vision,
+            text=text_emb,
+            narration=narration_text
+        )
+
+        return clip_path
+
+    @property
+    def clips_saved(self) -> int:
+        return self._clip_count
+
+
+# ============================================================================
 # VOICE INTERFACE
 # ============================================================================
 
@@ -1070,7 +1146,7 @@ class WorkshopBernard:
 
         self.vjepa = VJEPAEncoder(
             "./models/base/vjepa2",
-            "./models/adapters/workshop_lora_20260117_041817",
+            "./models/adapters/workshop_lora_20260201_181753",
             self.device
         )
 
@@ -1082,6 +1158,11 @@ class WorkshopBernard:
         # Legacy voice interface (uses shared model)
         self.voice = VoiceInterface(whisper_model=self.whisper_model)
 
+        # Text encoder for training clips (CPU to avoid VRAM pressure)
+        print("  Loading text encoder (MiniLM)...")
+        self.text_encoder = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
+        print("  Text encoder loaded")
+
         # Memory, focus, and tracking
         self.memory = MemoryStore()
         self.focus = FocusSelector()
@@ -1090,6 +1171,9 @@ class WorkshopBernard:
         self.episodes = EpisodeMemory()
         self.novelty = NoveltyScorer()
 
+        # Session clip saver for automatic training data
+        self.clip_saver = SessionClipSaver(self.text_encoder)
+
         # Camera
         self.cap = None
         self.frame_buffer = []
@@ -1097,8 +1181,13 @@ class WorkshopBernard:
         # Continuous listening components
         self.continuous_listening_enabled = continuous_listening
         self.voice_event_queue: queue.Queue = queue.Queue()
+        self.narration_queue: queue.Queue = queue.Queue()
         self.listener: Optional[ContinuousListener] = None
         self.visual_buffer: Optional[RollingVisualBuffer] = None
+
+        # Latest narration for training clip association
+        self._latest_narration: Optional[VoiceEvent] = None
+        self._narration_lock = threading.Lock()
 
         # Last recognition state (for corrections/confirmations)
         self.last_recognition: Optional[LastRecognition] = None
@@ -1174,6 +1263,7 @@ class WorkshopBernard:
         print("Debug window will show detections\n")
 
         self.cap = cv2.VideoCapture(0)
+        self.cap.set(cv2.CAP_PROP_FPS, 30)
 
         # Start continuous listening components
         if self.continuous_listening_enabled:
@@ -1186,7 +1276,8 @@ class WorkshopBernard:
 
             self.listener = ContinuousListener(
                 whisper_model=self.whisper_model,
-                event_queue=self.voice_event_queue
+                event_queue=self.voice_event_queue,
+                narration_queue=self.narration_queue
             )
             self.listener.start()
 
@@ -1199,11 +1290,12 @@ class WorkshopBernard:
                 # Process voice events if continuous listening enabled
                 if self.continuous_listening_enabled:
                     self._process_voice_events()
+                    self._process_narration_events()
                 print("-" * 50)
                 
-                # Capture frames for V-JEPA (need 64)
+                # Capture frames for V-JEPA (5s real-time, downsampled to 64)
                 print("  👁 Watching...")
-                frames = self._capture_frames(64)
+                frames = self._capture_frames(64, realtime=True)
                 
                 if frames is None:
                     continue
@@ -1299,8 +1391,8 @@ class WorkshopBernard:
                     self.memory.objects[match_name].last_seen = time.time()
                     self.memory.objects[match_name].times_seen += 1
 
-                    # Record episode
-                    self.episodes.record_episode(
+                    # Record episode + training clip
+                    self._record_episode_with_clip(
                         objects=[{
                             'name': match_name,
                             'category': focus_obj.label,
@@ -1309,9 +1401,9 @@ class WorkshopBernard:
                             'is_focus': True
                         }],
                         event_type="observation",
-                        embedding=scene_emb.cpu().numpy()
+                        embedding=scene_emb.cpu().numpy(),
+                        scene_embedding=scene_emb
                     )
-                    print(f"     [Episode recorded]")  # ADD THIS LINE
                     
                     # Optionally add this view to strengthen memory
                     if confidence < 0.90:
@@ -1373,17 +1465,57 @@ class WorkshopBernard:
         except KeyboardInterrupt:
             self._shutdown()
     
-    def _capture_frames(self, num_frames: int = 64) -> Optional[np.ndarray]:
-        """Capture frames from camera"""
+    def _capture_frames(self, num_frames: int = 64,
+                        realtime: bool = False,
+                        capture_duration: float = 5.0,
+                        target_fps: float = 30.0) -> Optional[np.ndarray]:
+        """Capture frames from camera.
+
+        Args:
+            num_frames: Number of frames to return (64 for V-JEPA)
+            realtime: If True, capture at real FPS over capture_duration
+                      then uniformly downsample to num_frames.
+                      If False, grab num_frames as fast as possible.
+            capture_duration: Seconds to capture when realtime=True
+            target_fps: Target FPS when realtime=True
+        """
+        if not realtime:
+            # Fast mode: grab frames as fast as camera feeds them
+            frames = []
+            for _ in range(num_frames):
+                ret, frame = self.cap.read()
+                if ret:
+                    frames.append(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            if len(frames) == num_frames:
+                return np.array(frames)
+            return None
+
+        # Real-time mode: capture at target FPS, then downsample
+        raw_target = int(capture_duration * target_fps)
         frames = []
-        for _ in range(num_frames):
+        start_time = time.time()
+        frame_interval = 1.0 / target_fps
+
+        for i in range(raw_target):
+            expected_time = start_time + i * frame_interval
+
             ret, frame = self.cap.read()
             if ret:
                 frames.append(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        
-        if len(frames) == num_frames:
-            return np.array(frames)
-        return None
+
+            # Maintain target FPS timing
+            now = time.time()
+            sleep_time = expected_time + frame_interval - now
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+
+        if len(frames) < num_frames:
+            return None
+
+        # Uniform downsample to num_frames
+        indices = np.linspace(0, len(frames) - 1, num_frames, dtype=int)
+        downsampled = [frames[i] for i in indices]
+        return np.array(downsampled)
     
     def _learn_new_object(self, detection: Detection, embedding: torch.Tensor, 
                           frames: np.ndarray):
@@ -1423,20 +1555,20 @@ class WorkshopBernard:
                     else:
                         misclass_embedding = None
                     
-                    self.episodes.record_episode(
+                    self._record_episode_with_clip(
                         objects=[{
                             'name': name,
-                            'category': detection.label,  # What Florence saw
-                            'known_category': existing_obj.category,  # What we know it to be
+                            'category': detection.label,
+                            'known_category': existing_obj.category,
                             'confidence': 1.0,
                             'bbox': detection.bbox,
                             'is_focus': True
                         }],
                         event_type="misclassification",
                         event_detail=f"Florence classified '{name}' as '{detection.label}' but it's actually a '{existing_obj.category}'",
-                        embedding=misclass_embedding
+                        embedding=misclass_embedding,
+                        scene_embedding=misclass_embedding
                     )
-                    print(f"     [Misclassification episode recorded for training]")
                 
                 # Add this view to the existing object
                 self.memory.add_object(name, existing_obj.category, embedding)
@@ -1605,7 +1737,7 @@ class WorkshopBernard:
         else:
             learning_embedding = None
         
-        self.episodes.record_episode(
+        self._record_episode_with_clip(
             objects=[{
                 'name': name,
                 'category': detection.label,
@@ -1615,9 +1747,11 @@ class WorkshopBernard:
             }],
             event_type="learning",
             event_detail=f"Learned new object '{name}' with {views_captured} views",
-            embedding=learning_embedding
+            embedding=learning_embedding,
+            scene_embedding=learning_embedding,
+            narration=f"Learning {name}"
         )
-    
+
     def _spatial_learning_loop(self, name: str, category: str, initial_bbox: Tuple[int, int, int, int],
                                 initial_embedding: torch.Tensor, initial_frames: np.ndarray):
         """
@@ -1746,7 +1880,7 @@ class WorkshopBernard:
         else:
             learning_embedding = None
         
-        self.episodes.record_episode(
+        self._record_episode_with_clip(
             objects=[{
                 'name': name,
                 'category': category,
@@ -1756,9 +1890,11 @@ class WorkshopBernard:
             }],
             event_type="learning",
             event_detail=f"Learned object '{name}' with {views_captured} views",
-            embedding=learning_embedding
+            embedding=learning_embedding,
+            scene_embedding=learning_embedding,
+            narration=f"Learning {name}"
         )
-    
+
     def _correct_recognition(self, detection: Detection, embedding: torch.Tensor,
                               frames: np.ndarray, wrong_name: str):
         """Correct a mistaken recognition"""
@@ -1890,7 +2026,7 @@ class WorkshopBernard:
         else:
             correction_embedding = None
         
-        self.episodes.record_episode(
+        self._record_episode_with_clip(
             objects=[{
                 'name': correct_name,
                 'category': detection.label,
@@ -1900,7 +2036,9 @@ class WorkshopBernard:
             }],
             event_type="correction",
             event_detail=f"Corrected misidentification from '{wrong_name}' to '{correct_name}'",
-            embedding=correction_embedding
+            embedding=correction_embedding,
+            scene_embedding=correction_embedding,
+            narration=f"Correcting to {correct_name}"
         )
     
     def _shutdown(self):
@@ -1970,6 +2108,78 @@ class WorkshopBernard:
 
             self._handle_voice_event(event)
 
+    def _process_narration_events(self):
+        """Drain narration queue, keep most recent for training clip association."""
+        latest = None
+        while True:
+            try:
+                event = self.narration_queue.get_nowait()
+                latest = event
+            except queue.Empty:
+                break
+        if latest is not None:
+            with self._narration_lock:
+                self._latest_narration = latest
+
+    def _get_and_clear_narration(self, max_age: float = 10.0) -> Optional[VoiceEvent]:
+        """Get latest narration if recent enough, then clear it."""
+        with self._narration_lock:
+            if self._latest_narration is None:
+                return None
+            age = time.time() - self._latest_narration.timestamp
+            if age > max_age:
+                self._latest_narration = None
+                return None
+            narration = self._latest_narration
+            self._latest_narration = None
+            return narration
+
+    def _record_episode_with_clip(self, objects, event_type, event_detail="",
+                                   embedding=None, narration=None,
+                                   scene_embedding=None):
+        """Record an episode AND save a training clip.
+
+        Args:
+            objects: Object dicts for episode memory
+            event_type: Episode event type
+            event_detail: Episode detail string
+            embedding: Embedding for episode memory (object-region or scene)
+            narration: Transcript text for training clip
+            scene_embedding: Full-scene V-JEPA embedding for training clip.
+                If None, falls back to embedding param.
+        """
+        # Record episode as before
+        episode = self.episodes.record_episode(
+            objects=objects,
+            event_type=event_type,
+            event_detail=event_detail,
+            embedding=embedding
+        )
+
+        # Determine scene embedding for training clip
+        clip_emb = scene_embedding if scene_embedding is not None else embedding
+        if clip_emb is not None:
+            # Convert torch tensor to numpy if needed
+            if hasattr(clip_emb, 'cpu'):
+                clip_emb = clip_emb.cpu().numpy()
+
+            # If no narration provided, check for recent narration
+            if narration is None:
+                recent = self._get_and_clear_narration(max_age=10.0)
+                if recent is not None:
+                    narration = recent.transcript
+
+            clip_path = self.clip_saver.save_clip(
+                vision_embedding=clip_emb,
+                narration=narration,
+                event_type=event_type,
+                event_detail=event_detail
+            )
+            if clip_path:
+                print(f"     [Training clip #{self.clip_saver.clips_saved} saved]")
+
+        return episode
+
     def _handle_voice_event(self, event: VoiceEvent):
         """Route voice events to appropriate handlers"""
         # Get visual context from ~1.5 seconds before speech ended
@@ -1981,24 +2191,24 @@ class WorkshopBernard:
             return
 
         if event.intent == Intent.IDENTIFY:
-            self._handle_identify(visual_context)
+            self._handle_identify(visual_context, event)
 
         elif event.intent == Intent.TEACH:
             if event.extracted_name:
-                self._handle_teach(event.extracted_name, visual_context)
+                self._handle_teach(event.extracted_name, visual_context, event)
             else:
                 print(f"  Couldn't parse object name from: '{event.transcript}'")
 
         elif event.intent == Intent.CORRECT:
             if event.extracted_name:
-                self._handle_correct(event.extracted_name)
+                self._handle_correct(event.extracted_name, event)
             else:
                 print(f"  Couldn't parse correction from: '{event.transcript}'")
 
         elif event.intent == Intent.CONFIRM:
-            self._handle_confirm()
+            self._handle_confirm(event)
 
-    def _handle_identify(self, context: BufferedFrame):
+    def _handle_identify(self, context: BufferedFrame, event: VoiceEvent):
         """Handle 'what's this?' queries"""
         # Find focused object from detections
         focus_obj = self.focus.select_focus(
@@ -2031,8 +2241,8 @@ class WorkshopBernard:
                 focus_obj.bbox, embedding
             )
 
-            # Record observation episode
-            self.episodes.record_episode(
+            # Record observation episode + training clip
+            self._record_episode_with_clip(
                 objects=[{
                     'name': match_name,
                     'category': focus_obj.label,
@@ -2041,13 +2251,16 @@ class WorkshopBernard:
                     'is_focus': True
                 }],
                 event_type="observation",
-                event_detail=f"Identified '{match_name}' via voice query"
+                event_detail=f"Identified '{match_name}' via voice query",
+                embedding=embedding,
+                scene_embedding=context.embedding,
+                narration=event.transcript
             )
         else:
             print(f"\n  I see a {focus_obj.label}, but I don't recognize which specific one")
             print(f"  Say 'this is called [name]' to teach me")
 
-    def _handle_teach(self, object_name: str, context: BufferedFrame):
+    def _handle_teach(self, object_name: str, context: BufferedFrame, event: VoiceEvent):
         """Handle 'this is called X' teaching"""
         # Find focused object
         focus_obj = self.focus.select_focus(
@@ -2071,7 +2284,7 @@ class WorkshopBernard:
                 print(f"  (Note: Florence sees '{focus_obj.label}' but I know it as '{existing.category}')")
 
                 # Record misclassification episode
-                self.episodes.record_episode(
+                self._record_episode_with_clip(
                     objects=[{
                         'name': object_name,
                         'category': focus_obj.label,
@@ -2081,7 +2294,10 @@ class WorkshopBernard:
                         'is_focus': True
                     }],
                     event_type="misclassification",
-                    event_detail=f"Florence classified '{object_name}' as '{focus_obj.label}' but it's '{existing.category}'"
+                    event_detail=f"Florence classified '{object_name}' as '{focus_obj.label}' but it's '{existing.category}'",
+                    embedding=embedding,
+                    scene_embedding=context.embedding,
+                    narration=event.transcript
                 )
             else:
                 print(f"\n  Adding view to existing '{object_name}'")
@@ -2098,8 +2314,8 @@ class WorkshopBernard:
             focus_obj.bbox, embedding
         )
 
-        # Record learning episode
-        self.episodes.record_episode(
+        # Record learning episode + training clip
+        self._record_episode_with_clip(
             objects=[{
                 'name': object_name,
                 'category': focus_obj.label,
@@ -2108,7 +2324,10 @@ class WorkshopBernard:
                 'is_focus': True
             }],
             event_type="learning",
-            event_detail=f"Learned '{object_name}' via voice teaching"
+            event_detail=f"Learned '{object_name}' via voice teaching",
+            embedding=embedding,
+            scene_embedding=context.embedding,
+            narration=event.transcript
         )
 
         # Record training data
@@ -2119,7 +2338,7 @@ class WorkshopBernard:
                 confirmed=True
             )
 
-    def _handle_correct(self, correct_name: str):
+    def _handle_correct(self, correct_name: str, event: VoiceEvent):
         """Handle 'no, that's X' corrections"""
         last = self._get_last_recognition()
 
@@ -2165,8 +2384,10 @@ class WorkshopBernard:
             last.bbox, last.embedding
         )
 
-        # Record correction episode
-        self.episodes.record_episode(
+        # Record correction episode + training clip
+        latest_visual = self.visual_buffer.get_latest() if self.visual_buffer else None
+        scene_emb = latest_visual.embedding if latest_visual else None
+        self._record_episode_with_clip(
             objects=[{
                 'name': correct_name,
                 'category': last.category,
@@ -2175,10 +2396,13 @@ class WorkshopBernard:
                 'is_focus': True
             }],
             event_type="correction",
-            event_detail=f"Corrected '{wrong_name}' to '{correct_name}' via voice"
+            event_detail=f"Corrected '{wrong_name}' to '{correct_name}' via voice",
+            embedding=last.embedding,
+            scene_embedding=scene_emb,
+            narration=event.transcript
         )
 
-    def _handle_confirm(self):
+    def _handle_confirm(self, event: VoiceEvent):
         """Handle 'yes'/'correct' confirmations"""
         last = self._get_last_recognition()
 
@@ -2197,8 +2421,10 @@ class WorkshopBernard:
         else:
             print(f"\n  Confirmed: **{last.name}**")
 
-        # Record confirmation episode
-        self.episodes.record_episode(
+        # Record confirmation episode + training clip
+        latest_visual = self.visual_buffer.get_latest() if self.visual_buffer else None
+        scene_emb = latest_visual.embedding if latest_visual else None
+        self._record_episode_with_clip(
             objects=[{
                 'name': last.name,
                 'category': last.category,
@@ -2207,7 +2433,10 @@ class WorkshopBernard:
                 'is_focus': True
             }],
             event_type="confirmation",
-            event_detail=f"User confirmed identification of '{last.name}'"
+            event_detail=f"User confirmed identification of '{last.name}'",
+            embedding=last.embedding,
+            scene_embedding=scene_emb,
+            narration=event.transcript
         )
 
     def _get_frames_for_embedding(self, target_time: float) -> np.ndarray:
