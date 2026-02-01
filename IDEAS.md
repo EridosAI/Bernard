@@ -512,6 +512,110 @@ Near-term: Synthetic text → semantic distillation
 Future: Real-world text fine-tuning
 End state: Written text is just another visual feature
 
+### 2026-01-31 — Semantic Scaffolding: Why Conversations Vanish But Objects Persist
+
+Core observation: We remember objects virtually forever but forget the discussions and circumstances that led to the knowledge. Why?
+
+Objects are stable points in embedding space. Conversations are trajectories.
+
+A record player is a dense cluster of features — visual, tactile, functional, acoustic. Every encounter reinforces roughly the same embedding. The semantic value is the embedding, and it's compact. You know what a record is even if you haven't seen one in years.
+
+A conversation isn't a thing — it's a process that moves you through semantic space. The words are the steering mechanism. What persists isn't the trajectory (the words, the back-and-forth) — it's where you ended up. Your world model updated. That update is what you "remember."
+
+**Language as semantic scaffolding:** The conversation was the link-forming process, not a thing to be stored. The object or situation it was about gains new associations. The scaffolding gets discarded once the structure is built.
+
+**The telephone wire metaphor applies:** You don't remember the electrical signals that carried a phone call. You remember what was communicated. The conversation is the wire; the meaning is what travels through it.
+
+**Why we remember *that* but not *what*:** We often recall that a conversation happened (temporal marker, emotional tone, who was present) without remembering what was said. The perceptual anchors persist because they're grounded in stable embeddings. The linguistic content was always disposable.
+
+**Implication for Bernard:** May not need to store conversations at all — just the associative updates they produce. Episode memory captures "something happened here, involving these objects, with this emotional register." The specific words were never the point.
+
+#### Intensity as Dwell Time
+
+Two triggers encourage long-term retention of conversational information:
+
+- **Emotion** — involuntary intensity boost
+- **Intentional focus** — voluntary intensity boost ("trying to remember")
+
+Both modulate the same thing: how strongly associations get written. The difference is what's driving the gain knob.
+
+**Architectural mechanism:** This might just be dwell time in the encoding process. High-emotion moments capture attention longer. "Trying to remember" is literally holding something in active processing longer. Both result in more encoding cycles, stronger initial signal, more resistance to decay.
+
+No "importance" flag needed. The encoding process just needs to be sensitive to how long something stays active. The rest follows.
+
+**Phenomenological alignment:** "Trying to remember" feels like effortful attention because it *is* effortful attention. The mechanism matches the experience. We're not programming outcomes — we're designing process, and the behavior emerges.
+
+---
+
+### 2026-01-31 — Self-Supervised Speech Learning: Closing the Acoustic Loop
+
+**Core concept:** Use speaker and microphone together so the system can hear its own output and learn to produce speech through self-correction, the same way children do.
+
+**The child's calibration process:**
+
+Children talk to themselves constantly during language acquisition. This isn't noise — it's instrument tuning:
+
+1. Hear target sound (parent's speech, environmental audio)
+2. Attempt to produce similar sound (vocal cord + mouth = motor control)
+3. Hear own output through same auditory pathway
+4. Error signal = difference between target and produced sound
+5. Iterate until production matches target
+
+The closed loop allows self-supervised learning of speech production without explicit instruction.
+
+**Application to Bernard:**
+
+- **Input:** Target audio (movies, speech samples, user's voice)
+- **Output:** Attempted reproduction via speaker
+- **Self-monitoring:** Microphone captures own output
+- **Comparison:** In embedding space, not text — acoustic patterns compared directly
+- **Training:** Error signal refines production pathway
+
+This is learning to speak the way babies do. No text-to-speech. Sound pattern → semantic meaning → motor command → sound pattern. The loop closes in acoustic-semantic space.
+
+**Key insight:** The system needs to hear itself. Without self-monitoring, there's no error signal for production quality. With it, speech emerges from the same predict-compare-correct loop that drives all the other learning.
+
+**Extension: Directional hearing**
+
+Multiple microphones enable spatial audio processing:
+
+- Sound source localization (where is this coming from?)
+- Selective attention (focus on one source among many)
+- Speaker discrimination (who is talking?)
+
+This adds "where" to "what" — spatial grounding for auditory experience.
+
+**Relation to Semantic Audio JEPA:** This production-loop is the output side of that architecture. Audio JEPA learns to understand; this loop learns to produce. Together they complete the acoustic pathway without text bottleneck.
+
+---
+
+### 2026-01-31 — Memory Palace as Learned Retrieval Structure
+
+**Core concept:** Use memory palace technique as a trainable navigation layer over the associative map. Associations form bottom-up from co-occurrence (unchanged), but a secondary spatial scaffold learns efficient retrieval pathways. Hybrid of semantic flexibility and structured indexing.
+
+**Key insight:** The palace isn't where memories live — it's a learned index that makes traversal reliable. You're not changing what's stored, you're training the retrieval pathways until they fire automatically. "Greasing the groove" for memory access.
+
+**How it fits the architecture:**
+
+- **Associative map:** learns what memories relate to what (from object co-occurrence)
+- **Palace layer:** learns "from this region of perception-space, this location is the entry point"
+- Memories can be stored however they naturally form, but retrieval conforms to learned structure
+- Gives efficiency of database indexing without imposing rigid structure on storage
+
+**"As within, so without" consistency:** Uses spatial structure to organize internal experience the same way spatial structure organizes external perception. The inward JEPA already models memory-to-memory relationships — the palace adds a navigation topology trained for reliable access.
+
+**Analogy:** Human doesn't consciously remember where "eggs" lives in their mental palace — they just go there because the path is worn in. The retrieval becomes automatic through use.
+
+**Open questions:**
+
+- How does the palace structure get initialized? (Learned from scratch vs seeded with spatial priors)
+- Does the palace topology emerge naturally from usage patterns or need explicit training signal?
+- Relationship to always-on priming — does priming create the "worn paths"?
+
+**Status:** Early idea, architecturally compatible. Worth exploring after core associative map is functional.
+
+---
+
 ## Shelved Ideas
 
 *Ideas that were considered but set aside — with reasoning for why.*

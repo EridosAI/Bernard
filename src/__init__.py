@@ -13,6 +13,7 @@ Supporting modules:
     - episode_memory: Experience storage and retrieval
     - novelty_scorer: Curiosity-based attention
     - continuous_listening: Voice interaction pipeline
+    - tts: Text-to-speech via Edge TTS
     - inward_jepa: Associative memory predictor
     - beats_encoder: Audio embedding
 """
@@ -20,6 +21,7 @@ Supporting modules:
 from .episode_memory import EpisodeMemory
 from .novelty_scorer import NoveltyScorer
 from .continuous_listening import ContinuousListener, Intent, VoiceEvent
+from .tts import BernardVoice, warm_cache
 
 __all__ = [
     'EpisodeMemory',
@@ -27,4 +29,6 @@ __all__ = [
     'ContinuousListener',
     'Intent',
     'VoiceEvent',
+    'BernardVoice',
+    'warm_cache',
 ]

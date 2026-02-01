@@ -6,6 +6,8 @@
 
 *Note: "Eridos" is the company/brand name for the website, handles, and public presence. "Bernard" is the internal system name used in code.*
 
+**Canonical path:** `C:\Users\Jason\Desktop\Eridos\Bernard`
+
 ## Quick Reference
 
 ```bash
