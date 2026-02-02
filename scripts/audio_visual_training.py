@@ -251,10 +251,7 @@ class AudioVisualTrainer:
 
     def _load_encoders(self):
         """Load BEATs and V-JEPA encoders"""
-        try:
-            from .beats_encoder import BEATsEncoder
-        except ImportError:
-            from beats_encoder import BEATsEncoder
+        from src.core.beats_encoder import BEATsEncoder
 
         # BEATs
         self.beats_encoder = BEATsEncoder(
@@ -264,11 +261,8 @@ class AudioVisualTrainer:
 
         # V-JEPA - use existing VJEPAEncoder from project
         # Import here to avoid circular imports
-        import sys
-        sys.path.insert(0, str(Path(__file__).parent))
-
         try:
-            from bernard_integrated_v2 import VJEPAEncoder
+            from src.core.vjepa_encoder import VJEPAEncoder
             self.vjepa_encoder = VJEPAEncoder(
                 self.config.vjepa_path,
                 self.config.vjepa_adapter_path,
@@ -313,7 +307,7 @@ class AudioVisualTrainer:
 
     def _load_datasets(self):
         """Load train and test datasets with precomputed embeddings"""
-        from audio_visual_dataset import VGGSoundDataset, HowTo100MDataset, CombinedAVDataset
+        from scripts.audio_visual_dataset import VGGSoundDataset, HowTo100MDataset, CombinedAVDataset
 
         if self.config.use_combined:
             # Load both datasets and combine them

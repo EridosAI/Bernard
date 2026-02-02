@@ -24,7 +24,7 @@ from pathlib import Path
 # Add src to path for imports
 script_dir = Path(__file__).parent
 project_dir = script_dir.parent
-sys.path.insert(0, str(project_dir / "src"))
+sys.path.insert(0, str(project_dir))
 
 import argparse
 import json
@@ -104,7 +104,7 @@ def main():
     print()
 
     # Import training modules
-    from audio_visual_training import AudioVisualTrainingConfig, AudioVisualTrainer
+    from scripts.audio_visual_training import AudioVisualTrainingConfig, AudioVisualTrainer
 
     # Create config for combined training
     config = AudioVisualTrainingConfig(

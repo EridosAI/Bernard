@@ -10,9 +10,9 @@ import sys
 from pathlib import Path
 from collections import Counter
 
-# Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-from episode_memory import EpisodeMemory
+# Add project root to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from src.core.episode_memory import EpisodeMemory
 
 def main():
     print("=" * 60)
