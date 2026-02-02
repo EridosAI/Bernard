@@ -505,11 +505,11 @@ def train(config: TrainingConfig, session_filter: str = None):
     print("=" * 50)
     
     try:
-        from .episode_memory import EpisodeMemory
-        from .inward_jepa import InwardJEPA, InwardJEPATrainer, train_inward_jepa
+        from src.core.episode_memory import EpisodeMemory
+        from src.experimental.inward_jepa import InwardJEPA, InwardJEPATrainer, train_inward_jepa
     except ImportError:
-        from episode_memory import EpisodeMemory
-        from inward_jepa import InwardJEPA, InwardJEPATrainer, train_inward_jepa
+        from src.core.episode_memory import EpisodeMemory
+        from src.experimental.inward_jepa import InwardJEPA, InwardJEPATrainer, train_inward_jepa
     
     # Load episode memory
     episode_memory_path = "./data/episode_memory.json"

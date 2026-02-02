@@ -261,11 +261,11 @@ def precompute_embeddings(
     print("\nLoading encoders...")
 
     # BEATs encoder
-    from beats_encoder import BEATsEncoder
+    from src.core.beats_encoder import BEATsEncoder
     beats = BEATsEncoder()
 
     # V-JEPA encoder - use standalone version
-    from vjepa_encoder import VJEPAEncoder
+    from src.core.vjepa_encoder import VJEPAEncoder
 
     # Find adapter if exists
     adapters_dir = Path("./models/adapters")
@@ -279,7 +279,7 @@ def precompute_embeddings(
     vjepa = VJEPAEncoder(adapter_path=adapter_path)
 
     # ImageBind encoder
-    from imagebind_encoder import ImageBindEncoder
+    from src.experimental.imagebind_encoder import ImageBindEncoder
     imagebind = ImageBindEncoder(device=device)
 
     # Collect all samples from data sources

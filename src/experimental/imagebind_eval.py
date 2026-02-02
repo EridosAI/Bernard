@@ -51,13 +51,13 @@ class DistillationEvaluator:
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
 
         # Load projection heads
-        from imagebind_distillation import load_projection_heads
+        from src.experimental.imagebind_distillation import load_projection_heads
         self.audio_proj, self.visual_proj = load_projection_heads(
             checkpoint_path, self.device
         )
 
         # Load ImageBind (for text encoding)
-        from imagebind_encoder import ImageBindEncoder
+        from src.experimental.imagebind_encoder import ImageBindEncoder
         self.imagebind = ImageBindEncoder(self.device)
 
         # Lazy-load student encoders (only when needed)
@@ -68,7 +68,7 @@ class DistillationEvaluator:
     def beats_encoder(self):
         """Lazy-load BEATs encoder"""
         if self._beats_encoder is None:
-            from beats_encoder import BEATsEncoder
+            from src.core.beats_encoder import BEATsEncoder
             self._beats_encoder = BEATsEncoder()
         return self._beats_encoder
 
@@ -76,7 +76,7 @@ class DistillationEvaluator:
     def vjepa_encoder(self):
         """Lazy-load V-JEPA encoder"""
         if self._vjepa_encoder is None:
-            from vjepa_encoder import VJEPAEncoder
+            from src.core.vjepa_encoder import VJEPAEncoder
             self._vjepa_encoder = VJEPAEncoder()
         return self._vjepa_encoder
 
