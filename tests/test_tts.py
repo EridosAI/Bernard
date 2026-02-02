@@ -1,5 +1,5 @@
 import asyncio
-from src.tts import BernardVoice
+from src.core.tts import BernardVoice
 
 
 async def test_voice():

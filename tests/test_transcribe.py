@@ -15,10 +15,10 @@ import os
 import queue
 import time
 
-# Add src to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+# Add project root to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from continuous_listening import ContinuousListener
+from src.core.continuous_listening import ContinuousListener
 
 
 def main():

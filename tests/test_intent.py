@@ -15,10 +15,10 @@ Live test runs the full VAD -> Whisper -> Intent pipeline.
 import sys
 import os
 
-# Add src to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+# Add project root to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from continuous_listening import classify_intent, Intent
+from src.core.continuous_listening import classify_intent, Intent
 
 
 # =============================================================================
@@ -113,7 +113,7 @@ def run_live_test():
     """Full pipeline: VAD -> Whisper -> Intent classification via mic."""
     import queue
     import whisper
-    from continuous_listening import ContinuousListener
+    from src.core.continuous_listening import ContinuousListener
 
     print("=" * 60)
     print("Intent Classification Live Test - Phase 3")
