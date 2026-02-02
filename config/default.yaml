@@ -1,0 +1,32 @@
+# Model paths
+vjepa_model_path: "./models/base/vjepa2"
+vjepa_adapter_path: "./models/adapters/workshop_lora_latest"
+beats_checkpoint: "./models/base/beats/BEATs_iter3_plus_AS2M.pt"
+florence_model: "microsoft/Florence-2-base"
+
+# Device
+device: "cuda"
+
+# Internal JEPA settings
+internal_jepa:
+  d_internal: 512
+  num_encoder_layers: 6
+  num_predictor_layers: 3
+  num_heads: 8
+  context_window: 16
+  learning_rate: 0.0001
+  weight_decay: 0.01
+
+# Cortex settings
+visual_cortex:
+  tick_rate_hz: 5.0
+  ema_decay: 0.9
+
+audio_cortex:
+  tick_rate_hz: 10.0
+  ema_decay: 0.85
+
+# Paths
+data_dir: "./data"
+models_dir: "./models"
+logs_dir: "./logs"
