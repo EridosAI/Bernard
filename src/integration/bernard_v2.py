@@ -30,10 +30,7 @@ import wave
 import soundfile as sf
 
 # Continuous listening
-try:
-    from .continuous_listening import ContinuousListener, Intent, VoiceEvent
-except ImportError:
-    from continuous_listening import ContinuousListener, Intent, VoiceEvent
+from src.core.continuous_listening import ContinuousListener, Intent, VoiceEvent
 
 # Models
 from transformers import AutoModel, AutoVideoProcessor
@@ -42,16 +39,10 @@ from peft import PeftModel
 from sentence_transformers import SentenceTransformer
 
 # Episode Memory
-try:
-    from .episode_memory import EpisodeMemory
-except ImportError:
-    from episode_memory import EpisodeMemory
+from src.core.episode_memory import EpisodeMemory
 
 # Novelty Scoring
-try:
-    from .novelty_scorer import NoveltyScorer
-except ImportError:
-    from novelty_scorer import NoveltyScorer
+from src.core.novelty_scorer import NoveltyScorer
 
 # ============================================================================
 # DATA STRUCTURES
